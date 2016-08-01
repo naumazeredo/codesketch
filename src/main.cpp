@@ -6,7 +6,7 @@
 #include "externs.h"
 #include "text.h"
 #include "sketch.h"
-#include "filesystem.h"
+#include "shell.h"
 
 namespace codesketch {
 
