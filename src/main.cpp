@@ -103,6 +103,7 @@ enum Commands {
   COLOR,
   POINT,
   LINE,
+  RECT,
   NUM
 };
 
@@ -243,6 +244,10 @@ void receiveData() {
       if (type == Commands::COLOR) SDL_SetRenderDrawColor(renderer, x, y, z, 255);
       if (type == Commands::POINT) SDL_RenderDrawPoint(renderer, x, y);
       if (type == Commands::LINE) SDL_RenderDrawLine(renderer, x, y, z, w);
+      if (type == Commands::RECT) {
+        SDL_Rect rect = {x, y, z, w};
+        SDL_RenderDrawRect(renderer, &rect);
+      }
 
       command = strtok(nullptr, "\n");
     }

@@ -6,6 +6,7 @@ enum Commands {
   COLOR,
   POINT,
   LINE,
+  RECT,
   NUM
 };
 
@@ -20,6 +21,7 @@ int main() {
     printf("%c %d %d %d\n", Commands::COLOR, 0, 0, 0);
     for (int i = 0; i <= 480; i+=9)
       printf("%c %d %d %d %d\n", Commands::LINE, i*4/3, 0, 640, i);
+    printf("%c %d %d %d %d", Commands::RECT, 100, 100, 50, 50);
   }
 
   return 0;
