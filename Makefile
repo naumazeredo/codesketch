@@ -3,7 +3,7 @@ LIBS=-lSDL2 -lSDL2_ttf -lstdc++fs
 OPTS=-Wall -std=c++1z
 
 EXE=bin/codesketch.out
-SRCS=src/main.cpp src/sketch.cpp src/text.cpp
+SRCS=src/main.cpp src/sketch.cpp src/text.cpp src/filesystem.cpp
 
 SKETCH=bin/sketch.out
 SKETCHSRC=sketch/sketch.cpp

@@ -34,7 +34,7 @@ void textRender(const std::string& text, int x, int y, int size) {
 
   if (fontCache.find(size) == fontCache.end()) {
     // Load font
-    font = TTF_OpenFont((rootPath / "fonts/prstartk.ttf").c_str(), size);
+    font = TTF_OpenFont((shellRoot / "fonts/prstartk.ttf").c_str(), size);
     if (font == nullptr) {
       printf("Error: %s\n", TTF_GetError());
       return;
