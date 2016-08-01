@@ -1,7 +1,14 @@
 #ifndef CODESKETCH_CORE_EXTERNS_H
 #define CODESKETCH_CORE_EXTERNS_H
 
+#include <experimental/filesystem>
+
+#include <map>
+
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
+namespace fs = std::experimental::filesystem;
 
 namespace codesketch {
 
@@ -19,6 +26,14 @@ extern Uint32 mouseState;
 
 // Sketch
 extern const Uint8* keystate;
+
+// Text
+extern std::map<int, TTF_Font*> fontCache;
+extern SDL_Color textColor;
+extern int textSize;
+
+// Filesystem
+extern fs::path rootPath;
 }
 
 #endif

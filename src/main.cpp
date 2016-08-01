@@ -14,6 +14,7 @@ using namespace std::experimental::filesystem;
 #include <SDL2/SDL_ttf.h>
 
 #include "externs.h"
+#include "text.h"
 #include "sketch.h"
 
 namespace codesketch {
@@ -26,10 +27,6 @@ bool isRunning = true;
 
 int mouseX, mouseY;
 Uint32 mouseState;
-
-map<int, TTF_Font*> fontCache;
-SDL_Color fontColor = {255, 255, 255};
-int fontSize = 16;
 
 // Filesystem
 const int terminal_x = 20,
@@ -126,7 +123,8 @@ void init() {
   // TODO(naum): treat errors
   // Initialize SDL
   SDL_Init(SDL_INIT_VIDEO);
-  TTF_Init();
+
+  textInit();
 
   // Create window
   window = SDL_CreateWindow(
@@ -137,39 +135,11 @@ void init() {
 }
 
 void shutdown() {
-  // Destroy fonts
-  for (auto it : fontCache)
-    TTF_CloseFont(it.second);
+  textQuit();
 
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
-  TTF_Quit();
   SDL_Quit();
-}
-
-void renderText(const char* text, int x, int y, int size = fontSize) {
-  TTF_Font* font = nullptr;
-
-  if (fontCache.find(size) == fontCache.end()) {
-    // Load font
-    font = TTF_OpenFont((rootPath / "fonts/prstartk.ttf").c_str(), size);
-    if (font == nullptr) {
-      printf("Error: %s\n", TTF_GetError());
-      return;
-    }
-
-    fontCache[size] = font;
-  } else {
-    font = fontCache[size];
-  }
-
-  SDL_Surface* surface = TTF_RenderText_Solid(font, text, fontColor);
-  SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-  SDL_Rect renderRect = { x, y, surface->w, surface->h };
-  SDL_RenderCopy(renderer, texture, nullptr, &renderRect);
-
-  SDL_FreeSurface(surface);
-  SDL_DestroyTexture(texture);
 }
 
 void run() {
@@ -216,8 +186,8 @@ void run() {
     } else {
       SDL_RenderClear(renderer);
 
-      renderText("Code Sketch", 20, 20, 32);
-      if (textInput.length() > 0) renderText(textInput.c_str(), 20, 60);
+      textRender("Code Sketch", 20, 20, 32);
+      if (textInput.length() > 0) textRender(textInput.c_str(), 20, 60);
     }
 
     SDL_RenderPresent(renderer);
