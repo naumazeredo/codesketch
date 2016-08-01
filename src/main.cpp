@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #include <cstdio>
 #include <string>
@@ -176,6 +177,8 @@ bool openSketch(const char* name) {
     close(sketchin[READ]);
     close(sketchout[WRITE]);
     close(sketcherr[WRITE]);
+
+    fcntl(sketchout[READ], F_SETFL, fcntl(sketchout[READ], F_GETFL, 0) | O_NONBLOCK);
   } else {
     // Error
 
@@ -220,25 +223,29 @@ void receiveData() {
   char data[1024];
   memset(data, 0, sizeof(data));
 
-  read(sketchout[READ], data, 1024);
-  char* command = strtok(data, "\n");
-  while (command != nullptr) {
-    char type;
-    int x, y, z, w;
-    sscanf(command, "%c %d %d %d %d", &type, &x, &y, &z, &w);
+  while (1) {
+    int bytesread = read(sketchout[READ], data, 1024);
+    if (bytesread <= 0) break;
 
-    if (type == Commands::BACKGROUND) {
-      Uint8 r, g, b, a;
-      SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
-      SDL_SetRenderDrawColor(renderer, x, y, z, 255);
-      SDL_RenderClear(renderer);
-      SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    char* command = strtok(data, "\n");
+    while (command != nullptr) {
+      char type;
+      int x, y, z, w;
+      sscanf(command, "%c %d %d %d %d", &type, &x, &y, &z, &w);
+
+      if (type == Commands::BACKGROUND) {
+        Uint8 r, g, b, a;
+        SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+        SDL_SetRenderDrawColor(renderer, x, y, z, 255);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(renderer, r, g, b, a);
+      }
+      if (type == Commands::COLOR) SDL_SetRenderDrawColor(renderer, x, y, z, 255);
+      if (type == Commands::POINT) SDL_RenderDrawPoint(renderer, x, y);
+      if (type == Commands::LINE) SDL_RenderDrawLine(renderer, x, y, z, w);
+
+      command = strtok(nullptr, "\n");
     }
-    if (type == Commands::COLOR) SDL_SetRenderDrawColor(renderer, x, y, z, 255);
-    if (type == Commands::POINT) SDL_RenderDrawPoint(renderer, x, y);
-    if (type == Commands::LINE) SDL_RenderDrawLine(renderer, x, y, z, w);
-
-    command = strtok(nullptr, "\n");
   }
 }
 
