@@ -241,7 +241,7 @@ void receiveData() {
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, r, g, b, a);
       }
-      if (type == Commands::COLOR) SDL_SetRenderDrawColor(renderer, x, y, z, 255);
+      if (type == Commands::COLOR) SDL_SetRenderDrawColor(renderer, x, y, z, w);
       if (type == Commands::POINT) SDL_RenderDrawPoint(renderer, x, y);
       if (type == Commands::LINE) SDL_RenderDrawLine(renderer, x, y, z, w);
       if (type == Commands::RECT) {

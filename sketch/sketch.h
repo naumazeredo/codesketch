@@ -1,0 +1,143 @@
+#include <cstdio>
+#include <cstdint>
+
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+
+typedef int8_t  i8;
+typedef int16_t i16;
+typedef int32_t i32;
+
+enum Commands {
+  NOTHING,
+  BACKGROUND,
+  STROKECOLOR,
+  POINT,
+  LINE,
+  RECT,
+
+  // XXX(naum): Not implemented
+  FILLCOLOR,
+  STROKEWIDTH,
+  CIRCLE,
+  ELLIPSE,
+
+  CAMERA,
+  WINDOW,
+
+  EXIT,
+
+  NUM
+};
+
+enum {
+  // Letters
+  KEY_A, KEY_B, KEY_C, KEY_D,
+  KEY_E, KEY_F, KEY_G, KEY_H,
+  KEY_I, KEY_J, KEY_K, KEY_L,
+  KEY_M, KEY_N, KEY_O, KEY_P,
+  KEY_Q, KEY_R, KEY_S, KEY_T,
+  KEY_U, KEY_V, KEY_W, KEY_X,
+  KEY_Y, KEY_Z,
+
+  // Numbers
+  KEY_0, KEY_1, KEY_2, KEY_3,
+  KEY_4, KEY_5, KEY_6, KEY_7,
+  KEY_8, KEY_9,
+
+  // Arrows
+  KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT,
+
+  KEY_RETURN, KEY_BACKSPACE,
+  KEY_SPACE, KEY_DELETE,
+
+  // F keys
+  KEY_F1, KEY_F2, KEY_F3, KEY_F4,
+  KEY_F5, KEY_F6, KEY_F7, KEY_F8,
+  KEY_F9, KEY_F10, KEY_F11, KEY_F12,
+
+  // Mod Keys
+  KEY_LSHIFT, KEY_RSHIFT,
+  KEY_LCTRL, KEY_RCTRL,
+
+  KEY_SHIFT, KEY_CTRL,
+
+  KEY_TOTAL
+};
+
+int windowWidth, windowHeight;
+int mouseX, mouseY;
+int mouseState_;
+char keystate_[256];
+
+// User declared functions
+void setup();
+void draw();
+
+int main() {
+  // Unbuffered stdout
+  setbuf(stdout, 0);
+
+  // Setup
+  scanf("%d %d %d %d %d %s",
+        &windowWidth, &windowHeight,
+        &mouseX, &mouseY, &mouseState_,
+        keystate_);
+  setup();
+
+  while (scanf("%d %d %d %d %d %s",
+               &windowWidth, &windowHeight,
+               &mouseX, &mouseY, &mouseState_,
+               keystate_) != EOF) {
+    draw();
+  }
+
+  return 0;
+}
+
+// Mouse and keyboard
+bool mousePressedLeft() {
+  return mouseState_ & 1;
+}
+
+bool mousePressedRight() {
+  return mouseState_ & 2;
+}
+
+bool keydown_(u8 key) {
+  return keystate_[key]-'0';
+}
+
+bool keyPressed(u8 key) {
+  if (key == KEY_SHIFT) return keydown_(KEY_LSHIFT) | keydown_(KEY_RSHIFT);
+  if (key == KEY_CTRL) return keydown_(KEY_LCTRL) | keydown_(KEY_RCTRL);
+  return keydown_(key);
+}
+
+void background(u8 r, u8 g, u8 b) {
+  printf("%c %d %d %d\n", Commands::BACKGROUND, r, g, b);
+}
+
+void stroke(u8 r, u8 g, u8 b, u8 a = 0xff) {
+  printf("%c %d %d %d %d\n", Commands::STROKECOLOR, r, g, b, a);
+}
+
+void point(i32 x, i32 y) {
+  printf("%c %d %d\n", Commands::POINT, x, y);
+}
+
+void line(i32 x0, i32 y0, i32 x1, i32 y1) {
+  printf("%c %d %d %d %d\n", Commands::LINE, x0, y0, x1, y1);
+}
+
+void rect(i32 x, i32 y, u16 w, u16 h) {
+  printf("%c %d %d %d %d\n", Commands::RECT, x, y, w, h);
+}
+
+// XXX(naum): Not implemented
+
+void fill(u8 r, u8 g, u8 b, u8 a = 0xff) {
+  printf("%c %d %d %d %d\n", Commands::FILLCOLOR, r, g, b, a);
+}
+
