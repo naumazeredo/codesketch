@@ -97,14 +97,26 @@ const int keys[] = {
 
 const int keysSize = sizeof(keys)/sizeof(keys[0]);
 
-enum Commands {
-  NOTHING,
-  BACKGROUND,
-  COLOR,
-  POINT,
-  LINE,
-  RECT,
-  NUM
+enum {
+  COMMAND_NOTHING,
+  COMMAND_BACKGROUND,
+  COMMAND_STROKECOLOR,
+  COMMAND_POINT,
+  COMMAND_LINE,
+  COMMAND_RECT,
+
+  // XXX(naum): Not implemented
+  COMMAND_FILLCOLOR,
+  COMMAND_STROKEWIDTH,
+  COMMAND_CIRCLE,
+  COMMAND_ELLIPSE,
+
+  COMMAND_CAMERA,
+  COMMAND_WINDOW,
+
+  COMMAND_EXIT,
+
+  COMMAND_NUM
 };
 
 // Sketch subprocess
@@ -234,17 +246,17 @@ void receiveData() {
       int x, y, z, w;
       sscanf(command, "%c %d %d %d %d", &type, &x, &y, &z, &w);
 
-      if (type == Commands::BACKGROUND) {
+      if (type == COMMAND_BACKGROUND) {
         Uint8 r, g, b, a;
         SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
         SDL_SetRenderDrawColor(renderer, x, y, z, 255);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, r, g, b, a);
       }
-      if (type == Commands::COLOR) SDL_SetRenderDrawColor(renderer, x, y, z, w);
-      if (type == Commands::POINT) SDL_RenderDrawPoint(renderer, x, y);
-      if (type == Commands::LINE) SDL_RenderDrawLine(renderer, x, y, z, w);
-      if (type == Commands::RECT) {
+      if (type == COMMAND_STROKECOLOR) SDL_SetRenderDrawColor(renderer, x, y, z, w);
+      if (type == COMMAND_POINT) SDL_RenderDrawPoint(renderer, x, y);
+      if (type == COMMAND_LINE) SDL_RenderDrawLine(renderer, x, y, z, w);
+      if (type == COMMAND_RECT) {
         SDL_Rect rect = {x, y, z, w};
         SDL_RenderDrawRect(renderer, &rect);
       }

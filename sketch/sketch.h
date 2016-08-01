@@ -9,26 +9,26 @@ typedef int8_t  i8;
 typedef int16_t i16;
 typedef int32_t i32;
 
-enum Commands {
-  NOTHING,
-  BACKGROUND,
-  STROKECOLOR,
-  POINT,
-  LINE,
-  RECT,
+enum {
+  COMMAND_NOTHING,
+  COMMAND_BACKGROUND,
+  COMMAND_STROKECOLOR,
+  COMMAND_POINT,
+  COMMAND_LINE,
+  COMMAND_RECT,
 
   // XXX(naum): Not implemented
-  FILLCOLOR,
-  STROKEWIDTH,
-  CIRCLE,
-  ELLIPSE,
+  COMMAND_FILLCOLOR,
+  COMMAND_STROKEWIDTH,
+  COMMAND_CIRCLE,
+  COMMAND_ELLIPSE,
 
-  CAMERA,
-  WINDOW,
+  COMMAND_CAMERA,
+  COMMAND_WINDOW,
 
-  EXIT,
+  COMMAND_EXIT,
 
-  NUM
+  COMMAND_NUM
 };
 
 enum {
@@ -63,7 +63,7 @@ enum {
 
   KEY_SHIFT, KEY_CTRL,
 
-  KEY_TOTAL
+  KEY_NUM
 };
 
 int windowWidth, windowHeight;
@@ -116,28 +116,28 @@ bool keyPressed(u8 key) {
 }
 
 void background(u8 r, u8 g, u8 b) {
-  printf("%c %d %d %d\n", Commands::BACKGROUND, r, g, b);
+  printf("%c %d %d %d\n", COMMAND_BACKGROUND, r, g, b);
 }
 
 void stroke(u8 r, u8 g, u8 b, u8 a = 0xff) {
-  printf("%c %d %d %d %d\n", Commands::STROKECOLOR, r, g, b, a);
+  printf("%c %d %d %d %d\n", COMMAND_STROKECOLOR, r, g, b, a);
 }
 
 void point(i32 x, i32 y) {
-  printf("%c %d %d\n", Commands::POINT, x, y);
+  printf("%c %d %d\n", COMMAND_POINT, x, y);
 }
 
 void line(i32 x0, i32 y0, i32 x1, i32 y1) {
-  printf("%c %d %d %d %d\n", Commands::LINE, x0, y0, x1, y1);
+  printf("%c %d %d %d %d\n", COMMAND_LINE, x0, y0, x1, y1);
 }
 
 void rect(i32 x, i32 y, u16 w, u16 h) {
-  printf("%c %d %d %d %d\n", Commands::RECT, x, y, w, h);
+  printf("%c %d %d %d %d\n", COMMAND_RECT, x, y, w, h);
 }
 
 // XXX(naum): Not implemented
 
 void fill(u8 r, u8 g, u8 b, u8 a = 0xff) {
-  printf("%c %d %d %d %d\n", Commands::FILLCOLOR, r, g, b, a);
+  printf("%c %d %d %d %d\n", COMMAND_FILLCOLOR, r, g, b, a);
 }
 
