@@ -14,14 +14,14 @@ typedef std::function<void (const std::vector<std::string>&)> ShellFn;
 
 namespace codesketch {
 
-// TODO(naum): remove const and do better!
-/*
+// XXX(naum): remove const and do better?
 const int shellX = 20,
           shellY = 60,
           shellW = windowWidth - 40,
-          shellH = windowHeight - 80;
+          shellH = windowHeight - 80,
+          shellTextSize = 16,
+          shellLineH = 20;
 const std::string shellPS1 = "> ", shellPS2 = "- ";
-*/
 
 void shellOpLs  (const std::vector<std::string>&);
 void shellOpCd  (const std::vector<std::string>&);
@@ -41,7 +41,13 @@ const std::pair<std::string, ShellFn> shellOps[] = {
 const int shellOpsSize = sizeof(shellOps)/sizeof(shellOps[0]);
 
 void shellAddHistory(const std::string&);
-void shellParse(const std::string&);
+void shellClearHistory();
+
+void shellParseInput();
+void shellDraw();
+
+void shellBackspace();
+void shellAddInput(const std::string&);
 
 }
 

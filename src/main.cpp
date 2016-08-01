@@ -46,8 +46,9 @@ void run() {
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
 
+  shellAddHistory("Type help for help!");
+
   SDL_StartTextInput();
-  std::string textInput;
 
   unsigned ticks = SDL_GetTicks();
   isRunning = true;
@@ -56,6 +57,8 @@ void run() {
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
         isRunning = false;
+        if (sketchIsRunning())
+          sketchClose();
       }
 
       if (sketchIsRunning()) {
@@ -64,14 +67,15 @@ void run() {
         }
       } else {
         if (event.type == SDL_KEYDOWN) {
-          if (event.key.keysym.sym == SDLK_BACKSPACE and textInput.length() > 0) {
-            textInput.pop_back();
+          if (event.key.keysym.sym == SDLK_BACKSPACE) {
+            shellBackspace();
           } else if (event.key.keysym.sym == SDLK_RETURN) {
-            shellParse(textInput);
-            textInput.clear();
+            shellParseInput();
+          } else if (event.key.keysym.sym == SDLK_l and SDL_GetModState() & KMOD_CTRL) {
+            shellClearHistory();
           }
         } else if (event.type == SDL_TEXTINPUT) {
-          textInput += event.text.text;
+          shellAddInput(event.text.text);
         }
       }
     }
@@ -79,15 +83,16 @@ void run() {
     keystate = SDL_GetKeyboardState(nullptr);
     mouseState = SDL_GetMouseState(&mouseX, &mouseY);
 
-    // If loaded sketch
     if (sketchIsRunning()) {
+      // If sketch is running, I/O the sketch
       sketchSendData();
       sketchReceiveData();
     } else {
+      // If sketch is not running, show the shell
       SDL_RenderClear(renderer);
 
       textRender("Code Sketch", 20, 20, 32);
-      if (textInput.length() > 0) textRender(textInput.c_str(), 20, 60);
+      shellDraw();
     }
 
     SDL_RenderPresent(renderer);
@@ -96,6 +101,8 @@ void run() {
     SDL_Delay(std::max(1000/60 - (SDL_GetTicks() - ticks), (Uint32)0));
     ticks = SDL_GetTicks();
   }
+
+  SDL_Delay(250);
 }
 
 }

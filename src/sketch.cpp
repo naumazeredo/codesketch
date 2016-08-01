@@ -74,22 +74,26 @@ bool sketchOpen(const std::string& name) {
 }
 
 void sketchClose() {
+  if (!sketchIsRunning()) return;
+
   kill(sketchpid, SIGKILL);
   close(sketchin[WRITE]);
   close(sketchout[READ]);
   close(sketcherr[READ]);
+  sketchpid = 0;
 }
 
 bool sketchIsRunning() {
-  if (sketchpid == 0) return false;
-
   sketchstatus = 0;
-  if (waitpid(sketchpid, &sketchstatus, WNOHANG) != 0) {
-    printf("Sketch exited!\n");
+  if (sketchpid == 0 or waitpid(sketchpid, &sketchstatus, WNOHANG) != 0) {
+    if (!SDL_IsTextInputActive())
+      SDL_StartTextInput();
     sketchpid = 0;
     return false;
   }
 
+  if (SDL_IsTextInputActive())
+    SDL_StopTextInput();
   return true;
 }
 

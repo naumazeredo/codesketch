@@ -4,7 +4,6 @@
 #include <experimental/filesystem>
 
 #include <map>
-#include <queue>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -34,8 +33,8 @@ extern SDL_Color textColor;
 extern int textSize;
 
 // Filesystem
-extern std::queue<std::string> shellHistory;
 extern fs::path shellRoot;
+extern std::string shellInput;
 }
 
 #endif
