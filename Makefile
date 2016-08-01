@@ -1,6 +1,6 @@
-CC=g++
-LIBS=-lSDL2 -lSDL2_ttf
-OPTS=-Wall -std=c++11
+CC=g++-6
+LIBS=-lSDL2 -lSDL2_ttf -lstdc++fs
+OPTS=-Wall -std=c++1z
 
 EXE=bin/codesketch.out
 SRCS=src/main.cpp

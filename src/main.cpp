@@ -4,9 +4,16 @@
 #include <fcntl.h>
 
 #include <cstdio>
-#include <string>
+
+#include <experimental/filesystem>
 #include <map>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <functional>
+#include <queue>
 using namespace std;
+using namespace std::experimental::filesystem;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -91,6 +98,99 @@ pid_t sketchpid = 0;
 int sketchin[2], sketchout[2], sketcherr[2];
 int sketchstatus = 0;
 
+bool openSketch(const char*);
+
+// Filesystem
+const int terminal_x = 20,
+          terminal_y = 60,
+          terminal_w = windowWidth - 40,
+          terminal_h = windowHeight - 80;
+const string terminal_ps1 = "> ", terminal_ps2 = "- ";
+queue<string> terminal_history;
+path rootPath = current_path();
+
+void terminal_add_history(const string& text) {
+  istringstream iss(text);
+  string token;
+  while (getline(iss, token, '\n')) {
+    // TODO(naum)
+  }
+}
+
+void shell_ls(const vector<string>&);
+void shell_cd(const vector<string>&);
+void shell_run(const vector<string>&);
+void shell_help(const vector<string>&);
+void shell_man(const vector<string>&);
+void shell_exit(const vector<string>&);
+
+void shell_ls(const vector<string>& args) {
+  for (auto& p : directory_iterator("."))
+    printf("%s\n", p.path().c_str());
+}
+
+void shell_cd(const vector<string>& args) {
+  if (args.size() == 1) {
+    current_path(rootPath);
+    return;
+  }
+
+  path cd_path = current_path() / args[1];
+  if (is_directory(cd_path)) current_path(cd_path);
+  else printf("cd: no such directory\n");
+}
+
+void shell_run(const vector<string>& args) {
+  if (args.size() < 2) {
+    printf("run expects one argument. Type \"man run\" for help.\n");
+    return;
+  }
+
+  path run_path = current_path() / args[1];
+  if (is_regular_file(run_path)) openSketch(run_path.c_str());
+  else printf("run: no such file\n");
+}
+
+void shell_help(const vector<string>& args) {
+  printf("help: not implemented\n");
+}
+
+void shell_man(const vector<string>& args) {
+  printf("man: not implemented\n");
+}
+
+void shell_exit(const vector<string>& args) {
+  printf("exit: not implemented\n");
+}
+
+const int shellnum = 6;
+string shellops[] = { "cd", "ls", "run", "help", "man", "exit" };
+function<void (const vector<string>&)> shellfns[] = {
+  &shell_cd, &shell_ls, &shell_run, &shell_help, &shell_man, &shell_exit
+};
+
+void shell_parse(const string& command) {
+  printf("Parsing: %s\n", command.c_str());
+  vector<string> args;
+  istringstream iss(command);
+  string token;
+  while (getline(iss, token, ' '))
+    args.push_back(token);
+
+  terminal_history.push(command);
+
+  if (args.size() > 0) {
+    for (int i = 0; i < shellnum; ++i) {
+      if (args[0] == shellops[i]) {
+        shellfns[i](args);
+        return;
+      }
+    }
+  }
+
+  printf("command not found\n");
+}
+
 void init() {
   // TODO(naum): treat errors
   // Initialize SDL
@@ -116,20 +216,20 @@ void shutdown() {
   SDL_Quit();
 }
 
-void renderText(const char* text, int x, int y) {
+void renderText(const char* text, int x, int y, int size = fontSize) {
   TTF_Font* font = nullptr;
 
-  if (fontCache.find(fontSize) == fontCache.end()) {
+  if (fontCache.find(size) == fontCache.end()) {
     // Load font
-    font = TTF_OpenFont("fonts/8bitwonder.ttf", fontSize);
+    font = TTF_OpenFont((rootPath / "fonts/prstartk.ttf").c_str(), size);
     if (font == nullptr) {
       printf("Error: %s\n", TTF_GetError());
       return;
     }
 
-    fontCache[fontSize] = font;
+    fontCache[size] = font;
   } else {
-    font = fontCache[fontSize];
+    font = fontCache[size];
   }
 
   SDL_Surface* surface = TTF_RenderText_Solid(font, text, fontColor);
@@ -262,22 +362,36 @@ void receiveData() {
 }
 
 void run() {
-  //openSketch("bin/sketch.out");
-
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
 
-  unsigned ticks = SDL_GetTicks();
+  SDL_StartTextInput();
+  string textInput;
 
+  unsigned ticks = SDL_GetTicks();
   isRunning = true;
   while (isRunning) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
         isRunning = false;
-      } else if (event.type == SDL_KEYDOWN and event.key.keysym.sym == SDLK_ESCAPE) {
-        // Kill sketch on ESC
-        if (isSketchRunning()) killSketch();
+      }
+
+      if (isSketchRunning()) {
+        if (event.type == SDL_KEYDOWN and event.key.keysym.sym == SDLK_ESCAPE) {
+          killSketch(); // Kill sketch on ESC
+        }
+      } else {
+        if (event.type == SDL_KEYDOWN) {
+          if (event.key.keysym.sym == SDLK_BACKSPACE and textInput.length() > 0) {
+            textInput.pop_back();
+          } else if (event.key.keysym.sym == SDLK_RETURN) {
+            shell_parse(textInput);
+            textInput.clear();
+          }
+        } else if (event.type == SDL_TEXTINPUT) {
+          textInput += event.text.text;
+        }
       }
     }
 
@@ -291,7 +405,8 @@ void run() {
     } else {
       SDL_RenderClear(renderer);
 
-      renderText("Code Sketch", 20, 20);
+      renderText("Code Sketch", 20, 20, 32);
+      if (textInput.length() > 0) renderText(textInput.c_str(), 20, 60);
     }
 
     SDL_RenderPresent(renderer);
