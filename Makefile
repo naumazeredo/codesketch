@@ -1,5 +1,5 @@
 CC=g++
-LIBS=-lSDL2
+LIBS=-lSDL2 -lSDL2_ttf
 OPTS=-Wall -std=c++11
 
 EXE=bin/codesketch.out

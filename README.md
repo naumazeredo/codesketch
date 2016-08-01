@@ -47,9 +47,11 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 ### Dependencies
 
 SDL2: `$ sudo apt-get install libsdl2-2.0-0`
+SDL2_ttf: `$ sudo apt-get install libsdl2-ttf-2.0-0`
 
 ## Contributing
 
 ### Dependencies
 
 SDL2: `$ sudo apt-get install libsdl2-dev`
+SDL2_ttf: `$ sudo apt-get install libsdl2-ttf-dev`
