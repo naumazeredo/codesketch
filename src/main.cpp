@@ -255,6 +255,8 @@ void run() {
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
 
+  unsigned ticks = SDL_GetTicks();
+
   isRunning = true;
   while (isRunning) {
     SDL_Event event;
@@ -277,6 +279,9 @@ void run() {
     }
 
     SDL_RenderPresent(renderer);
+
+    SDL_Delay(max(1000/60 - (SDL_GetTicks() - ticks), (Uint32)0));
+    ticks = SDL_GetTicks();
   }
 }
 
