@@ -11,11 +11,17 @@ typedef int32_t i32;
 
 enum {
   COMMAND_NOTHING,
+
   COMMAND_BACKGROUND,
+
   COMMAND_STROKECOLOR,
   COMMAND_POINT,
   COMMAND_LINE,
   COMMAND_RECT,
+
+  COMMAND_TEXT,
+  COMMAND_TEXTSIZE,
+  COMMAND_TEXTCOLOR,
 
   // XXX(naum): Not implemented
   COMMAND_FILLCOLOR,
@@ -133,6 +139,18 @@ void line(i32 x0, i32 y0, i32 x1, i32 y1) {
 
 void rect(i32 x, i32 y, u16 w, u16 h) {
   printf("%c %d %d %d %d\n", COMMAND_RECT, x, y, w, h);
+}
+
+void text(const char* t, i32 x, i32 y) {
+  printf("%c %d %d %s\n", COMMAND_TEXT, x, y, t);
+}
+
+void textSize(u16 s) {
+  printf("%c %d\n", COMMAND_TEXTSIZE, s);
+}
+
+void textColor(u8 r, u8 g, u8 b, u8 a = 0xff) {
+  printf("%c %d %d %d %d\n", COMMAND_TEXTCOLOR, r, g, b, a);
 }
 
 // XXX(naum): Not implemented

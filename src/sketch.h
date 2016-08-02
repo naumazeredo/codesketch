@@ -46,10 +46,15 @@ const int keysSize = sizeof(keys)/sizeof(keys[0]);
 enum {
   COMMAND_NOTHING,
   COMMAND_BACKGROUND,
+
   COMMAND_STROKECOLOR,
   COMMAND_POINT,
   COMMAND_LINE,
   COMMAND_RECT,
+
+  COMMAND_TEXT,
+  COMMAND_TEXTSIZE,
+  COMMAND_TEXTCOLOR,
 
   // XXX(naum): Not implemented
   COMMAND_FILLCOLOR,

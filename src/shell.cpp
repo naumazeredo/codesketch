@@ -146,13 +146,18 @@ void shellParseInput() {
 void shellDraw() {
   for (int i = 0; i < (int)shellHistory.size(); ++i) {
     std::string& history = shellHistory[i];
-    if (history.length()) textRender(history, shellX, shellY + i * shellLineH, shellTextSize);
+    if (history.length())
+      textRender(history, shellX, shellY + i * shellLineH, shellTextSize, colors::white);
   }
 
   if (isRunning)
-    textRender(shellPS1 + shellInput, shellX, shellY + shellHistory.size() * shellLineH, shellTextSize);
+    textRender(shellPS1 + shellInput,
+               shellX, shellY + shellHistory.size() * shellLineH,
+               shellTextSize, colors::white);
   else
-    textRender("Bye xD", shellX, shellY + shellHistory.size() * shellLineH, shellTextSize);
+    textRender("Bye xD",
+               shellX, shellY + shellHistory.size() * shellLineH,
+               shellTextSize, colors::white);
 }
 
 void shellBackspace() {

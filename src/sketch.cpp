@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 
 #include "externs.h"
+#include "text.h"
 
 namespace codesketch {
 
@@ -161,6 +162,26 @@ void sketchReceiveData() {
       cmd >> x >> y >> w >> h;
       SDL_Rect rect = {x, y, w, h};
       SDL_RenderDrawRect(renderer, &rect);
+    }
+
+    if (type == COMMAND_TEXT) {
+      int x, y;
+      std::string text;
+      cmd >> x >> y;
+      getline(cmd, text);
+      textRender(text, x, y);
+    }
+
+    if (type == COMMAND_TEXTSIZE) {
+      int s;
+      cmd >> s;
+      textSetSize(s);
+    }
+
+    if (type == COMMAND_TEXTCOLOR) {
+      int r, g, b, a;
+      cmd >> r >> g >> b >> a;
+      textSetColor(r, g, b, a);
     }
   }
 }

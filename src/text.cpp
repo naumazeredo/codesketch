@@ -10,7 +10,7 @@
 namespace codesketch {
 
 std::map<int, TTF_Font*> fontCache;
-SDL_Color textColor = {255, 255, 255};
+SDL_Color textColor = {255, 255, 255, 255};
 int textSize = 16;
 
 bool textInit() {
@@ -29,7 +29,7 @@ void textQuit() {
 }
 
 // TODO(naum): Return texture to avoid rerasterization
-void textRender(const std::string& text, int x, int y, int size) {
+void textRender(const std::string& text, int x, int y, int size, SDL_Color color) {
   TTF_Font* font = nullptr;
 
   if (fontCache.find(size) == fontCache.end()) {
@@ -52,6 +52,15 @@ void textRender(const std::string& text, int x, int y, int size) {
 
   SDL_FreeSurface(surface);
   SDL_DestroyTexture(texture);
+}
+
+void textSetSize(int size) {
+  if (size > 0)
+    textSize = size;
+}
+
+void textSetColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+  textColor = {r, g, b, a};
 }
 
 }
