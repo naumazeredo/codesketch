@@ -108,7 +108,8 @@ int keyPressed(int key);
 // Drawing
 
 // All colors MUST have values between 0 and 255, inclusive.
-// r = red, g = green, b = blue
+// Colors not between 0 and 255 will be truncated.
+// r = red, g = green, b = blue, a = alpha (default: 255)
 
 // Clear the whole screen with the color
 void background(int r, int g, int b);
@@ -123,6 +124,7 @@ void point(int x, int y);
 void line(int x0, int y0, int x1, int y1);
 
 // Draw a rectangle with upper-left corner at (x0, y0), width w and height h
+// (w and h must be positive)
 void rect(int x, int y, int w, int h);
 
 // Text

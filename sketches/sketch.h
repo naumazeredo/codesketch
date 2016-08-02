@@ -1,14 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-typedef uint8_t  u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-
-typedef int8_t  i8;
-typedef int16_t i16;
-typedef int32_t i32;
-
 enum {
   COMMAND_NOTHING,
 
@@ -111,51 +103,72 @@ int mousePressedRight() {
   return !!(mouseState_ & 2);
 }
 
-int keydown_(u8 key) {
+int keydown_(int key) {
   return keystate_[key]-'0';
 }
 
-int keyPressed(u8 key) {
+int keyPressed(int key) {
+  if (key < 0 or key >= KEY_NUM) return false;
+
   if (key == KEY_SHIFT) return keydown_(KEY_LSHIFT) | keydown_(KEY_RSHIFT);
   if (key == KEY_CTRL) return keydown_(KEY_LCTRL) | keydown_(KEY_RCTRL);
   return keydown_(key);
 }
 
-void background(u8 r, u8 g, u8 b) {
+void background(int r, int g, int b) {
+  if (r < 0) r = 0; if (r > 255) r = 255;
+  if (g < 0) g = 0; if (g > 255) g = 255;
+  if (b < 0) b = 0; if (b > 255) b = 255;
   printf("%c %d %d %d\n", COMMAND_BACKGROUND, r, g, b);
 }
 
-void stroke(u8 r, u8 g, u8 b, u8 a = 0xff) {
+void stroke(int r, int g, int b, int a = 0xff) {
+  if (r < 0) r = 0; if (r > 255) r = 255;
+  if (g < 0) g = 0; if (g > 255) g = 255;
+  if (b < 0) b = 0; if (b > 255) b = 255;
+  if (a < 0) a = 0; if (a > 255) a = 255;
   printf("%c %d %d %d %d\n", COMMAND_STROKECOLOR, r, g, b, a);
 }
 
-void point(i32 x, i32 y) {
+void point(int x, int y) {
   printf("%c %d %d\n", COMMAND_POINT, x, y);
 }
 
-void line(i32 x0, i32 y0, i32 x1, i32 y1) {
+void line(int x0, int y0, int x1, int y1) {
   printf("%c %d %d %d %d\n", COMMAND_LINE, x0, y0, x1, y1);
 }
 
-void rect(i32 x, i32 y, u16 w, u16 h) {
+void rect(int x, int y, int w, int h) {
+  if (w < 0) w = 0;
+  if (h < 0) h = 0;
   printf("%c %d %d %d %d\n", COMMAND_RECT, x, y, w, h);
 }
 
-void text(const char* t, i32 x, i32 y) {
+void text(const char* t, int x, int y) {
   printf("%c %d %d %s\n", COMMAND_TEXT, x, y, t);
 }
 
-void textSize(u16 s) {
+void textSize(int s) {
+  if (s < 0) s = 0;
   printf("%c %d\n", COMMAND_TEXTSIZE, s);
 }
 
-void textColor(u8 r, u8 g, u8 b, u8 a = 0xff) {
+void textColor(int r, int g, int b, int a = 0xff) {
+  if (r < 0) r = 0; if (r > 255) r = 255;
+  if (g < 0) g = 0; if (g > 255) g = 255;
+  if (b < 0) b = 0; if (b > 255) b = 255;
+  if (a < 0) a = 0; if (a > 255) a = 255;
   printf("%c %d %d %d %d\n", COMMAND_TEXTCOLOR, r, g, b, a);
 }
 
 // XXX(naum): Not implemented
 
-void fill(u8 r, u8 g, u8 b, u8 a = 0xff) {
+/*
+void fill(int r, int g, int b, int a = 0xff) {
+  if (r < 0) r = 0; if (r > 255) r = 255;
+  if (g < 0) g = 0; if (g > 255) g = 255;
+  if (b < 0) b = 0; if (b > 255) b = 255;
+  if (a < 0) a = 0; if (a > 255) a = 255;
   printf("%c %d %d %d %d\n", COMMAND_FILLCOLOR, r, g, b, a);
 }
-
+*/
