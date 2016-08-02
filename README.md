@@ -89,7 +89,7 @@ Sketch uses this to communicate between Code Sketch and your sketch**.
 int frameCounter;
 
 // Window size (modifying these don't alter the window size)
-int windowWidth, windowHeight
+int windowWidth, windowHeight;
 
 // Mouse position
 int mouseX, mouseY;
