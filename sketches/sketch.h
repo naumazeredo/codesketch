@@ -1,5 +1,5 @@
-#include <cstdio>
-#include <cstdint>
+#include <stdio.h>
+#include <stdint.h>
 
 typedef uint8_t  u8;
 typedef uint16_t u16;
@@ -97,19 +97,19 @@ int main() {
 }
 
 // Mouse and keyboard
-bool mousePressedLeft() {
-  return mouseState_ & 1;
+int mousePressedLeft() {
+  return !!(mouseState_ & 1);
 }
 
-bool mousePressedRight() {
-  return mouseState_ & 2;
+int mousePressedRight() {
+  return !!(mouseState_ & 2);
 }
 
-bool keydown_(u8 key) {
+int keydown_(u8 key) {
   return keystate_[key]-'0';
 }
 
-bool keyPressed(u8 key) {
+int keyPressed(u8 key) {
   if (key == KEY_SHIFT) return keydown_(KEY_LSHIFT) | keydown_(KEY_RSHIFT);
   if (key == KEY_CTRL) return keydown_(KEY_LCTRL) | keydown_(KEY_RCTRL);
   return keydown_(key);
