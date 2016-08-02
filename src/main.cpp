@@ -19,7 +19,7 @@ bool isRunning = true;
 int mouseX, mouseY;
 Uint32 mouseState;
 
-int frameCount = 0;
+int frameCount;
 
 void init() {
   // TODO(naum): treat errors
@@ -87,6 +87,7 @@ void run() {
       // If sketch is running, I/O the sketch
       sketchSendData();
       sketchReceiveData();
+      frameCount++;
     } else {
       // If sketch is not running, show the shell
       SDL_RenderClear(renderer);
@@ -99,8 +100,6 @@ void run() {
     // TODO(naum): verify if running slower than 60 FPS
     SDL_Delay(std::max(1000/60 - (SDL_GetTicks() - ticks), (Uint32)0));
     ticks = SDL_GetTicks();
-
-    frameCount++;
   }
 
   SDL_Delay(250);
