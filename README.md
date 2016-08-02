@@ -31,7 +31,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 
 - [x] Simple code sketch and sketchbook sources
 - [x] Simple Makefile
-- [ ] Implement text rendering
+- [x] Implement text rendering
 - [x] Create simple GUI in codesketch to list and run sketches
 - [x] Refactor code sketch for alfa version
 - [ ] Implement drawing primitives
@@ -49,6 +49,8 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Windows porting
 - [ ] Write README blank/incomplete sections
 - [ ] IMPORTANT: parallelize subprocess reading to avoid crash
+- [ ] Add version and configuration information (instead of sending same data to
+    setup)
 
 ## Learning with Code Sketch
 
