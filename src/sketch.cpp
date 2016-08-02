@@ -56,6 +56,8 @@ bool sketchOpen(const std::string& name) {
 
     fcntl(sketchout[READ], F_SETFL, fcntl(sketchout[READ], F_GETFL, 0) | O_NONBLOCK);
     fcntl(sketcherr[READ], F_SETFL, fcntl(sketcherr[READ], F_GETFL, 0) | O_NONBLOCK);
+
+    fcntl(sketchout[READ], F_SETPIPE_SZ, 1048576);
   } else {
     // Error
 
@@ -108,35 +110,57 @@ void sketchSendData() {
 }
 
 void sketchReceiveData() {
-  char data[1024];
-  memset(data, 0, sizeof(data));
+  // TODO IMPORTANT(naum): Multithread this
+  std::string data;
 
   while (1) {
-    int bytesread = read(sketchout[READ], data, 1024);
-    if (bytesread <= 0) break;
+    data = "";
+    while (1) {
+      char c;
+      int bytesread = read(sketchout[READ], &c, 1);
+      if (bytesread <= 0) return;
+      data += c;
+      if (c == '\n') break;
+    }
 
-    char* command = strtok(data, "\n");
-    while (command != nullptr) {
-      char type;
-      int x, y, z, w;
-      sscanf(command, "%c %d %d %d %d", &type, &x, &y, &z, &w);
+    char type;
+    std::istringstream cmd(data);
+    cmd >> type;
 
-      if (type == COMMAND_BACKGROUND) {
-        Uint8 r, g, b, a;
-        SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
-        SDL_SetRenderDrawColor(renderer, x, y, z, 255);
-        SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, r, g, b, a);
-      }
-      if (type == COMMAND_STROKECOLOR) SDL_SetRenderDrawColor(renderer, x, y, z, w);
-      if (type == COMMAND_POINT) SDL_RenderDrawPoint(renderer, x, y);
-      if (type == COMMAND_LINE) SDL_RenderDrawLine(renderer, x, y, z, w);
-      if (type == COMMAND_RECT) {
-        SDL_Rect rect = {x, y, z, w};
-        SDL_RenderDrawRect(renderer, &rect);
-      }
+    if (type == COMMAND_BACKGROUND) {
+      int nr, ng, nb;
+      cmd >> nr >> ng >> nb;
 
-      command = strtok(nullptr, "\n");
+      Uint8 r, g, b, a;
+      SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+      SDL_SetRenderDrawColor(renderer, nr, ng, nb, 255);
+      SDL_RenderClear(renderer);
+      SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    }
+
+    if (type == COMMAND_STROKECOLOR) {
+      int r, g, b, a;
+      cmd >> r >> g >> b >> a;
+      SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    }
+
+    if (type == COMMAND_POINT) {
+      int x, y;
+      cmd >> x >> y;
+      SDL_RenderDrawPoint(renderer, x, y);
+    }
+
+    if (type == COMMAND_LINE) {
+      int x0, y0, x1, y1;
+      cmd >> x0 >> y0 >> x1 >> y1;
+      SDL_RenderDrawLine(renderer, x0, y0, x1, y1);
+    }
+
+    if (type == COMMAND_RECT) {
+      int x, y, w, h;
+      cmd >> x >> y >> w >> h;
+      SDL_Rect rect = {x, y, w, h};
+      SDL_RenderDrawRect(renderer, &rect);
     }
   }
 }

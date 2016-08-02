@@ -48,6 +48,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Implement window resizing (?)
 - [ ] Windows porting
 - [ ] Write README blank/incomplete sections
+- [ ] IMPORTANT: parallelize subprocess reading to avoid crash
 
 ## Learning with Code Sketch
 
@@ -145,3 +146,8 @@ Happy coding!
 GCC>=6.1 (or some C++ compiler with C++1z File System support): http://askubuntu.com/questions/746369/how-can-i-install-and-use-gcc-6-on-xenial
 
 SDL2 libs: `sudo apt install libsdl2-dev libsdl2-ttf-dev`
+
+## Known bugs
+
+- When pipe reaches the size limit program stops working. Solution: parallelize
+    subprocess reading
