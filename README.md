@@ -146,7 +146,10 @@ void textColor(int r, int g, int b, int a);
 
 See examples in *sketches* folder if you have any doubts on how to use the API.
 
-Compile your code:
+Compile your code: `g++ mysketch.c -o mysketch.out` (on Linux)
+
+Run Code Sketch binary and type: `> run sketches/mysketch.out` (you can find
+your binary using `ls` and `cd` commands).
 
 ### Be creative!
 
