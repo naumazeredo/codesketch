@@ -89,7 +89,6 @@ void run() {
       // If sketch is not running, show the shell
       SDL_RenderClear(renderer);
 
-      textRender("Code Sketch", 20, 20, 32);
       shellDraw();
     }
 

@@ -45,7 +45,7 @@ void textRender(const std::string& text, int x, int y, int size, SDL_Color color
     font = fontCache[size];
   }
 
-  SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), textColor);
+  SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
   SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
   SDL_Rect renderRect = { x, y, surface->w, surface->h };
   SDL_RenderCopy(renderer, texture, nullptr, &renderRect);

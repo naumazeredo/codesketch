@@ -144,6 +144,8 @@ void shellParseInput() {
 }
 
 void shellDraw() {
+  textRender("Code Sketch", 20, 20, 32, colors::white);
+
   for (int i = 0; i < (int)shellHistory.size(); ++i) {
     std::string& history = shellHistory[i];
     if (history.length())

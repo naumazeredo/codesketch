@@ -124,6 +124,17 @@ void line(int x0, int y0, int x1, int y1);
 
 // Draw a rectangle with upper-left corner at (x0, y0), width w and height h
 void rect(int x, int y, int w, int h);
+
+// Text
+
+// Render text t with upper-left corner at (x, y)
+void text(const char* t, int x, int y);
+
+// Change text size (s must be positive)
+void textSize(int s);
+
+// Change text color
+void textColor(int r, int g, int b, int a);
 ```
 
 See examples in *sketches* folder if you have any doubts on how to use the API.
