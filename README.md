@@ -83,6 +83,9 @@ Sketch uses this to communicate between Code Sketch and your sketch**.
 #### API
 
 ```cpp
+// Frame counter since sketch startup
+int frameCounter;
+
 // Window size (modifying these don't alter the window size)
 int windowWidth, windowHeight
 

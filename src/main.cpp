@@ -19,6 +19,8 @@ bool isRunning = true;
 int mouseX, mouseY;
 Uint32 mouseState;
 
+int frameCount = 0;
+
 void init() {
   // TODO(naum): treat errors
   // Initialize SDL
@@ -97,6 +99,8 @@ void run() {
     // TODO(naum): verify if running slower than 60 FPS
     SDL_Delay(std::max(1000/60 - (SDL_GetTicks() - ticks), (Uint32)0));
     ticks = SDL_GetTicks();
+
+    frameCount++;
   }
 
   SDL_Delay(250);

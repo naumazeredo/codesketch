@@ -64,6 +64,7 @@ enum {
   KEY_NUM
 };
 
+int frameCount;
 int windowWidth, windowHeight;
 int mouseX, mouseY;
 int mouseState_;
@@ -78,13 +79,15 @@ int main() {
   setbuf(stdout, 0);
 
   // Setup
-  scanf("%d %d %d %d %d %s",
+  scanf("%d %d %d %d %d %d %s",
+        &frameCount,
         &windowWidth, &windowHeight,
         &mouseX, &mouseY, &mouseState_,
         keystate_);
   setup();
 
-  while (scanf("%d %d %d %d %d %s",
+  while (scanf("%d %d %d %d %d %d %s",
+               &frameCount,
                &windowWidth, &windowHeight,
                &mouseX, &mouseY, &mouseState_,
                keystate_) != EOF) {

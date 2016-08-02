@@ -72,6 +72,8 @@ bool sketchOpen(const std::string& name) {
     return false;
   }
 
+  frameCount = 0;
+
   usleep(1);
   return sketchIsRunning();
 }
@@ -105,7 +107,8 @@ void sketchSendData() {
   for (unsigned i = 0; i < keysSize; ++i) keysstr[i] = '0'+keystate[keys[i]];
 
   char data[1024];
-  sprintf(data, "%d %d %d %d %d %s\n", windowWidth, windowHeight, mouseX, mouseY, mouseState, keysstr);
+  sprintf(data, "%d %d %d %d %d %d %s\n",
+          frameCount, windowWidth, windowHeight, mouseX, mouseY, mouseState, keysstr);
 
   write(sketchin[WRITE], data, strlen(data));
 }

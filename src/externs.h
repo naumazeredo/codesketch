@@ -12,7 +12,7 @@ namespace fs = std::experimental::filesystem;
 
 namespace codesketch {
 
-// Window
+// Main
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 
@@ -23,6 +23,8 @@ extern bool isRunning;
 extern int mouseX;
 extern int mouseY;
 extern Uint32 mouseState;
+
+extern int frameCount;
 
 // Sketch
 extern const Uint8* keystate;
