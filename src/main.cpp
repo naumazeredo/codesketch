@@ -1,50 +1,57 @@
 #include <algorithm>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SFML/Graphics.hpp>
 
 #include "externs.h"
 #include "text.h"
-#include "sketch.h"
-#include "shell.h"
+//#include "sketch.h"
+//#include "shell.h"
 
 namespace codesketch {
 
-SDL_Window* window = nullptr;
-SDL_Renderer* renderer = nullptr;
+sf::ContextSettings settings;
+sf::RenderWindow window;
 
 int windowWidth = 640, windowHeight = 480;
-bool isRunning = true;
 
 int mouseX, mouseY;
-Uint32 mouseState;
+//u32 mouseState;
 
 int frameCount;
 
 void init() {
   // TODO(naum): treat errors
-  // Initialize SDL
-  SDL_Init(SDL_INIT_VIDEO);
+  // Initialize settings
+  settings.antialiasingLevel = 8;
 
+  // Initialize Window
+  window.create(
+    sf::VideoMode(windowWidth, windowHeight),
+    "CodeSketch",
+    sf::Style::Default,
+    settings
+  );
+
+  window.setFramerateLimit(60);
+
+  // Initialize text
   textInit();
-
-  // Create window
-  window = SDL_CreateWindow(
-    "Code Sketch",
-    SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-    windowWidth, windowHeight, 0);
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-}
-
-void shutdown() {
-  textQuit();
-
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  SDL_Quit();
 }
 
 void run() {
+  while (window.isOpen()) {
+    sf::Event event;
+    while (window.pollEvent(event)) {
+      if (event.type == sf::Event::Closed)
+        window.close();
+    }
+
+    window.clear();
+    textRender("Test", 100, 100);
+    window.display();
+  }
+
+  /*
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   SDL_RenderClear(renderer);
 
@@ -103,6 +110,7 @@ void run() {
   }
 
   SDL_Delay(250);
+  */
 }
 
 }
@@ -110,5 +118,4 @@ void run() {
 int main(int argc, char** argv) {
   codesketch::init();
   codesketch::run();
-  codesketch::shutdown();
 }

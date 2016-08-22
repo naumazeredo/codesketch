@@ -3,25 +3,17 @@
 
 #include <string>
 
+#include <SFML/Graphics.hpp>
+
 #include "externs.h"
 
 namespace codesketch {
 
-namespace colors {
-
-const SDL_Color white = {0xff, 0xff, 0xff, 0xff};
-const SDL_Color black = {0x00, 0x00, 0x00, 0xff};
-const SDL_Color red   = {0xff, 0x00, 0x00, 0xff};
-const SDL_Color green = {0x00, 0xff, 0x00, 0xff};
-const SDL_Color blue  = {0x00, 0x00, 0xff, 0xff};
-
-}
-
 bool textInit();
 void textQuit();
-void textRender(const std::string&, int, int, int size = textSize, SDL_Color color = textColor);
-void textSetSize(int);
-void textSetColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+void textRender(const std::string&, int, int, u32 size = textSize, sf::Color color = textColor);
+void textSetSize(u32);
+void textSetColor(u8 r, u8 g, u8 b, u8 a);
 
 }
 

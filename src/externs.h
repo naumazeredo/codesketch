@@ -1,20 +1,30 @@
 #ifndef CODESKETCH_CORE_EXTERNS_H
 #define CODESKETCH_CORE_EXTERNS_H
 
+#include <cstdint>
 #include <experimental/filesystem>
 
 #include <map>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SFML/Graphics.hpp>
 
 namespace fs = std::experimental::filesystem;
+
+// Int types
+typedef int8_t   i8;
+typedef int16_t  i16;
+typedef int32_t  i32;
+typedef int64_t  i64;
+
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 namespace codesketch {
 
 // Main
-extern SDL_Window* window;
-extern SDL_Renderer* renderer;
+extern sf::RenderWindow window;
 
 extern int windowWidth;
 extern int windowHeight;
@@ -22,21 +32,24 @@ extern bool isRunning;
 
 extern int mouseX;
 extern int mouseY;
-extern Uint32 mouseState;
+//extern u32 mouseState;
 
 extern int frameCount;
 
 // Sketch
-extern const Uint8* keystate;
+//extern const Uint8* keystate;
 
 // Text
-extern std::map<int, TTF_Font*> fontCache;
-extern SDL_Color textColor;
-extern int textSize;
+//extern std::map<int, TTF_Font*> fontCache;
+extern sf::Color textColor;
+extern u32 textSize;
 
 // Filesystem
+/*
 extern fs::path shellRoot;
 extern std::string shellInput;
+*/
+
 }
 
 #endif

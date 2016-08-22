@@ -31,13 +31,13 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 
 - [x] Simple code sketch and sketchbook sources
 - [x] Simple Makefile
-- [x] Implement text rendering
-- [x] Create simple GUI in codesketch to list and run sketches
+- [ ] Implement text rendering
+- [ ] Create simple GUI in codesketch to list and run sketches
 - [x] Refactor code sketch for alfa version
 - [ ] Implement drawing primitives
-  - [x] Points Built-in
-  - [x] Lines Built-in
-  - [x] Rectangles Built-in
+  - [ ] Points Built-in
+  - [ ] Lines Built-in
+  - [ ] Rectangles Built-in
   - [ ] Stroke width
   - [ ] Fill color
   - [ ] Points
@@ -56,7 +56,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 
 ### Install Dependencies
 
-`$ sudo apt-get install libsdl2-2.0-0 libsdl2-ttf-2.0-0`
+`$ sudo apt-get install libsfml-dev`
 
 ### Begin to code
 
@@ -166,7 +166,7 @@ Happy coding!
 
 GCC>=6.1 (or some C++ compiler with C++1z File System support): http://askubuntu.com/questions/746369/how-can-i-install-and-use-gcc-6-on-xenial
 
-SDL2 libs: `sudo apt install libsdl2-dev libsdl2-ttf-dev`
+SFML libs: `sudo apt install libsfml-dev`
 
 ## Known bugs
 
