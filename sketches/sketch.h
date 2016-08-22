@@ -40,26 +40,59 @@ enum {
   KEY_Y, KEY_Z,
 
   // Numbers
-  KEY_0, KEY_1, KEY_2, KEY_3,
-  KEY_4, KEY_5, KEY_6, KEY_7,
+  KEY_0, KEY_1,
+  KEY_2, KEY_3,
+  KEY_4, KEY_5,
+  KEY_6, KEY_7,
   KEY_8, KEY_9,
 
-  // Arrows
-  KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT,
-
-  KEY_RETURN, KEY_BACKSPACE,
-  KEY_SPACE, KEY_DELETE,
-
-  // F keys
-  KEY_F1, KEY_F2, KEY_F3, KEY_F4,
-  KEY_F5, KEY_F6, KEY_F7, KEY_F8,
-  KEY_F9, KEY_F10, KEY_F11, KEY_F12,
-
-  // Mod Keys
-  KEY_LSHIFT, KEY_RSHIFT,
+  // Modification keys
   KEY_LCTRL, KEY_RCTRL,
+  KEY_LSHIFT, KEY_RSHIFT,
+  KEY_LALT, KEY_RALT,
 
-  KEY_SHIFT, KEY_CTRL,
+  // [, ]
+  KEY_LBRACKET, KEY_RBRACKET,
+
+  KEY_SEMICOLON,
+  KEY_COMMA,
+  KEY_PERIOD,
+  KEY_QUOTE,
+  KEY_SLASH,
+  KEY_BACKSLASH,
+  KEY_TILDE,
+  KEY_EQUAL,
+  KEY_DASH,
+
+  KEY_SPACE,
+  KEY_RETURN,
+  KEY_BACKSPACE,
+  KEY_TAB,
+
+  KEY_PAGEUP, KEY_PAGEDOWN,
+  KEY_HOME, KEY_END,
+  KEY_INSERT, KEY_DELETE,
+
+  KEY_ADD, KEY_SUBTRACT,
+  KEY_MULTIPLY, KEY_DIVIDE,
+
+  KEY_LEFT, KEY_RIGHT,
+  KEY_UP,   KEY_DOWN,
+
+  KEY_NUMPAD0, KEY_NUMPAD1,
+  KEY_NUMPAD2, KEY_NUMPAD3,
+  KEY_NUMPAD4, KEY_NUMPAD5,
+  KEY_NUMPAD6, KEY_NUMPAD7,
+  KEY_NUMPAD8, KEY_NUMPAD9,
+
+  KEY_F1,  KEY_F2,
+  KEY_F3,  KEY_F4,
+  KEY_F5,  KEY_F6,
+  KEY_F7,  KEY_F8,
+  KEY_F9,  KEY_F10,
+  KEY_F11, KEY_F12,
+
+  KEY_SHIFT, KEY_CTRL, KEY_ALT,
 
   KEY_NUM
 };
@@ -115,6 +148,7 @@ int keyPressed(int key) {
 
   if (key == KEY_SHIFT) return keydown_(KEY_LSHIFT) | keydown_(KEY_RSHIFT);
   if (key == KEY_CTRL) return keydown_(KEY_LCTRL) | keydown_(KEY_RCTRL);
+  if (key == KEY_ALT) return keydown_(KEY_LALT) | keydown_(KEY_RALT);
   return keydown_(key);
 }
 

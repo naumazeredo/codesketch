@@ -32,23 +32,17 @@ extern bool isRunning;
 
 extern int mouseX;
 extern int mouseY;
-//extern u32 mouseState;
+extern u8 mouseState;
 
 extern int frameCount;
 
-// Sketch
-//extern const Uint8* keystate;
-
 // Text
-//extern std::map<int, TTF_Font*> fontCache;
 extern sf::Color textColor;
 extern u32 textSize;
 
 // Filesystem
-/*
 extern fs::path shellRoot;
 extern std::string shellInput;
-*/
 
 }
 

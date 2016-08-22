@@ -59,11 +59,8 @@ void shellOpRun(const std::vector<std::string>& args) {
   }
 
   fs::path run_path = fs::current_path() / args[1];
-  // FIXME(naum): Uncomment when sketch file is SFML-safe
-  /*
   if (fs::is_regular_file(run_path)) sketchOpen(run_path);
   else shellAddHistory("run: no such file\n");
-  */
 }
 
 void shellOpHelp(const std::vector<std::string>& args) {

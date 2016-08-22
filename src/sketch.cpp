@@ -6,16 +6,20 @@
 #include <fcntl.h>
 
 #include <cstdio>
+#include <cstring>
 #include <string>
 
-#include <SDL2/SDL.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 
 #include "externs.h"
 #include "text.h"
 
 namespace codesketch {
 
-const Uint8* keystate = nullptr;
+sf::Color fillColor = sf::Color::Black;
+sf::Color strokeColor = sf::Color::Black;
+u32 strokeSize = 1;
 
 // Subprocess
 pid_t sketchpid = 0;
@@ -91,20 +95,17 @@ void sketchClose() {
 bool sketchIsRunning() {
   sketchstatus = 0;
   if (sketchpid == 0 or waitpid(sketchpid, &sketchstatus, WNOHANG) != 0) {
-    if (!SDL_IsTextInputActive())
-      SDL_StartTextInput();
     sketchpid = 0;
     return false;
   }
 
-  if (SDL_IsTextInputActive())
-    SDL_StopTextInput();
   return true;
 }
 
 void sketchSendData() {
   char keysstr[keysSize+1] = {};
-  for (unsigned i = 0; i < keysSize; ++i) keysstr[i] = '0'+keystate[keys[i]];
+  for (unsigned i = 0; i < keysSize; ++i)
+    keysstr[i] = '0'+sf::Keyboard::isKeyPressed(keys[i]);
 
   char data[1024];
   sprintf(data, "%d %d %d %d %d %d %s\n",
@@ -132,39 +133,40 @@ void sketchReceiveData() {
     cmd >> type;
 
     if (type == COMMAND_BACKGROUND) {
-      int nr, ng, nb;
-      cmd >> nr >> ng >> nb;
+      int r, g, b;
+      cmd >> r >> g >> b;
 
-      Uint8 r, g, b, a;
-      SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
-      SDL_SetRenderDrawColor(renderer, nr, ng, nb, 255);
-      SDL_RenderClear(renderer);
-      SDL_SetRenderDrawColor(renderer, r, g, b, a);
+      window.clear({ (u8)r, (u8)g, (u8)b });
     }
 
     if (type == COMMAND_STROKECOLOR) {
       int r, g, b, a;
       cmd >> r >> g >> b >> a;
-      SDL_SetRenderDrawColor(renderer, r, g, b, a);
+      strokeColor = { (u8)r, (u8)g, (u8)b, (u8)a };
     }
 
     if (type == COMMAND_POINT) {
       int x, y;
       cmd >> x >> y;
-      SDL_RenderDrawPoint(renderer, x, y);
+
+      // TODO(naum): Change point size depending on stroke size
+      sf::CircleShape point {0.5f};
+      point.setPosition(x, y);
+      point.setFillColor(fillColor);
+      window.draw(point);
     }
 
     if (type == COMMAND_LINE) {
       int x0, y0, x1, y1;
       cmd >> x0 >> y0 >> x1 >> y1;
-      SDL_RenderDrawLine(renderer, x0, y0, x1, y1);
+      //SDL_RenderDrawLine(renderer, x0, y0, x1, y1);
     }
 
     if (type == COMMAND_RECT) {
       int x, y, w, h;
       cmd >> x >> y >> w >> h;
-      SDL_Rect rect = {x, y, w, h};
-      SDL_RenderDrawRect(renderer, &rect);
+      //SDL_Rect rect = {x, y, w, h};
+      //SDL_RenderDrawRect(renderer, &rect);
     }
 
     if (type == COMMAND_TEXT) {
