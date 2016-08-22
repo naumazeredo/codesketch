@@ -59,8 +59,11 @@ void shellOpRun(const std::vector<std::string>& args) {
   }
 
   fs::path run_path = fs::current_path() / args[1];
+  // FIXME(naum): Uncomment when sketch file is SFML-safe
+  /*
   if (fs::is_regular_file(run_path)) sketchOpen(run_path);
   else shellAddHistory("run: no such file\n");
+  */
 }
 
 void shellOpHelp(const std::vector<std::string>& args) {
@@ -98,7 +101,7 @@ void shellOpMan(const std::vector<std::string>& args) {
 }
 
 void shellOpExit(const std::vector<std::string>& args) {
-  isRunning = false;
+  window.close();
 }
 
 void shellAddHistory(const std::string& text) {
@@ -144,22 +147,28 @@ void shellParseInput() {
 }
 
 void shellDraw() {
-  textRender("Code Sketch", 20, 20, 32, colors::white);
+  textRender("Code Sketch", 20, 20, 32, sf::Color::White);
 
   for (int i = 0; i < (int)shellHistory.size(); ++i) {
     std::string& history = shellHistory[i];
     if (history.length())
-      textRender(history, shellX, shellY + i * shellLineH, shellTextSize, colors::white);
+      textRender(history, shellX, shellY + i * shellLineH, shellTextSize, sf::Color::White);
   }
 
-  if (isRunning)
+  // TODO(naum): "Bye" with SFML
+  textRender(shellPS1 + shellInput,
+             shellX, shellY + shellHistory.size() * shellLineH,
+             shellTextSize, sf::Color::White);
+  /*
+  if (window.isOpen())
     textRender(shellPS1 + shellInput,
                shellX, shellY + shellHistory.size() * shellLineH,
-               shellTextSize, colors::white);
+               shellTextSize, sf::Color::White);
   else
     textRender("Bye xD",
                shellX, shellY + shellHistory.size() * shellLineH,
-               shellTextSize, colors::white);
+               shellTextSize, sf::Color::White);
+  */
 }
 
 void shellBackspace() {

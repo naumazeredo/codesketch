@@ -4,8 +4,8 @@
 
 #include "externs.h"
 #include "text.h"
+#include "shell.h"
 //#include "sketch.h"
-//#include "shell.h"
 
 namespace codesketch {
 
@@ -39,35 +39,16 @@ void init() {
 }
 
 void run() {
+  window.clear();
+  shellAddHistory("Type help for help!");
+
   while (window.isOpen()) {
     sf::Event event;
     while (window.pollEvent(event)) {
       if (event.type == sf::Event::Closed)
         window.close();
-    }
 
-    window.clear();
-    textRender("Test", 100, 100);
-    window.display();
-  }
-
-  /*
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  SDL_RenderClear(renderer);
-
-  shellAddHistory("Type help for help!");
-
-  SDL_StartTextInput();
-
-  unsigned ticks = SDL_GetTicks();
-  isRunning = true;
-  while (isRunning) {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        isRunning = false;
-      }
-
+      /*
       if (sketchIsRunning()) {
         if (event.type == SDL_KEYDOWN and event.key.keysym.sym == SDLK_ESCAPE) {
           sketchClose();
@@ -85,30 +66,34 @@ void run() {
           shellAddInput(event.text.text);
         }
       }
+      */
     }
 
+    /*
     keystate = SDL_GetKeyboardState(nullptr);
     mouseState = SDL_GetMouseState(&mouseX, &mouseY);
+    */
 
+    /*
     if (sketchIsRunning()) {
       // If sketch is running, I/O the sketch
       sketchSendData();
       sketchReceiveData();
       frameCount++;
     } else {
+    */
       // If sketch is not running, show the shell
-      SDL_RenderClear(renderer);
+      window.clear();
 
       shellDraw();
+      /*
     }
+    */
 
-    SDL_RenderPresent(renderer);
-
-    // TODO(naum): verify if running slower than 60 FPS
-    SDL_Delay(std::max(1000/60 - (SDL_GetTicks() - ticks), (Uint32)0));
-    ticks = SDL_GetTicks();
+    window.display();
   }
 
+  /*
   SDL_Delay(250);
   */
 }
