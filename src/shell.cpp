@@ -176,8 +176,10 @@ void shellBackspace() {
     shellInput.pop_back();
 }
 
-void shellAddInput(const std::string& text) {
-  shellInput += text;
+void shellAddInput(u32 unicode) {
+  // Filter unicode to ascii
+  if (unicode < 32 or unicode >= 127) return;
+  shellInput += unicode;
 }
 
 }

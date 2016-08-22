@@ -54,17 +54,21 @@ void run() {
           sketchClose();
         }
       } else {
-        if (event.type == SDL_KEYDOWN) {
-          if (event.key.keysym.sym == SDLK_BACKSPACE) {
+      */
+        if (event.type == sf::Event::KeyPressed) {
+          if (event.key.code == sf::Keyboard::Key::BackSpace) {
             shellBackspace();
-          } else if (event.key.keysym.sym == SDLK_RETURN) {
+          } else if (event.key.code == sf::Keyboard::Key::Return) {
             shellParseInput();
-          } else if (event.key.keysym.sym == SDLK_l and SDL_GetModState() & KMOD_CTRL) {
+          } else if (event.key.code == sf::Keyboard::Key::L and event.key.control) {
             shellClearHistory();
+          } else if (event.key.code == sf::Keyboard::Key::D and event.key.control) {
+            window.close();
           }
-        } else if (event.type == SDL_TEXTINPUT) {
-          shellAddInput(event.text.text);
+        } else if (event.type == sf::Event::TextEntered) {
+          shellAddInput(event.text.unicode);
         }
+        /*
       }
       */
     }

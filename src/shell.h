@@ -47,7 +47,7 @@ void shellParseInput();
 void shellDraw();
 
 void shellBackspace();
-void shellAddInput(const std::string&);
+void shellAddInput(u32);
 
 }
 
