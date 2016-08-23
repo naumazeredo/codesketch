@@ -251,6 +251,13 @@ void sketchReceiveData() {
       window.draw(rect);
     }
 
+    if (type == COMMAND_FILLCOLOR) {
+      int r, g, b;
+      cmd >> r >> g >> b;
+
+      fillColor = { (u8)r, (u8)g, (u8)b };
+    }
+
     if (type == COMMAND_STROKECOLOR) {
       int r, g, b, a;
       cmd >> r >> g >> b >> a;
