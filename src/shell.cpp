@@ -156,16 +156,6 @@ void shellDraw() {
   textRender(shellPS1 + shellInput,
              shellX, shellY + shellHistory.size() * shellLineH,
              shellTextSize, sf::Color::White);
-  /*
-  if (window.isOpen())
-    textRender(shellPS1 + shellInput,
-               shellX, shellY + shellHistory.size() * shellLineH,
-               shellTextSize, sf::Color::White);
-  else
-    textRender("Bye xD",
-               shellX, shellY + shellHistory.size() * shellLineH,
-               shellTextSize, sf::Color::White);
-  */
 }
 
 void shellBackspace() {

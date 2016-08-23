@@ -134,25 +134,6 @@ void sketchReceiveData() {
     std::istringstream cmd(data);
     cmd >> type;
 
-    /*
-    COMMAND_NOTHING,
-    COMMAND_BACKGROUND,
-
-    COMMAND_POINT,
-    COMMAND_LINE,
-    COMMAND_RECT,
-    COMMAND_CIRCLE,
-
-    COMMAND_FILLCOLOR,
-
-    COMMAND_STROKECOLOR,
-    COMMAND_STROKETHICKNESS,
-
-    COMMAND_TEXT,
-    COMMAND_TEXTSIZE,
-    COMMAND_TEXTCOLOR,
-    */
-
     if (type == COMMAND_BACKGROUND) {
       int r, g, b;
       cmd >> r >> g >> b;

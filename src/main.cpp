@@ -92,10 +92,6 @@ void run() {
 
     window.display();
   }
-
-  /*
-  SDL_Delay(250);
-  */
 }
 
 }
