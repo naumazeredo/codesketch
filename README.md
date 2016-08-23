@@ -31,19 +31,15 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 
 - [x] Simple code sketch and sketchbook sources
 - [x] Simple Makefile
-- [ ] Implement text rendering
-- [ ] Create simple GUI in codesketch to list and run sketches
+- [x] Implement text rendering
+- [x] Create simple GUI in codesketch to list and run sketches
 - [x] Refactor code sketch for alfa version
-- [ ] Implement drawing primitives
-  - [ ] Points Built-in
-  - [ ] Lines Built-in
-  - [ ] Rectangles Built-in
-  - [ ] Stroke width
-  - [ ] Fill color
-  - [ ] Points
-  - [ ] Lines
-  - [ ] Rectangles
-  - [ ] Ellipses
+- [x] Implement drawing primitives
+  - [x] Points
+  - [x] Lines
+  - [x] Rectangles
+  - [x] Circles
+  - [ ] Ellipses (?)
 - [ ] Camera functionality
 - [ ] Implement window resizing (?)
 - [ ] Windows porting
