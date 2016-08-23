@@ -3,22 +3,23 @@
 
 enum {
   COMMAND_NOTHING,
-
   COMMAND_BACKGROUND,
 
-  COMMAND_STROKECOLOR,
   COMMAND_POINT,
   COMMAND_LINE,
   COMMAND_RECT,
+  COMMAND_CIRCLE,
+
+  COMMAND_FILLCOLOR,
+
+  COMMAND_STROKECOLOR,
+  COMMAND_STROKETHICKNESS,
 
   COMMAND_TEXT,
   COMMAND_TEXTSIZE,
   COMMAND_TEXTCOLOR,
 
   // XXX(naum): Not implemented
-  COMMAND_FILLCOLOR,
-  COMMAND_STROKEWIDTH,
-  COMMAND_CIRCLE,
   COMMAND_ELLIPSE,
 
   COMMAND_CAMERA,
@@ -156,7 +157,29 @@ void background(int r, int g, int b) {
   if (r < 0) r = 0; if (r > 255) r = 255;
   if (g < 0) g = 0; if (g > 255) g = 255;
   if (b < 0) b = 0; if (b > 255) b = 255;
-  printf("%c %d %d %d\n", COMMAND_BACKGROUND, r, g, b);
+  printf("%d %d %d %d\n", COMMAND_BACKGROUND, r, g, b);
+}
+
+void point(int x, int y) {
+  printf("%d %d %d\n", COMMAND_POINT, x, y);
+}
+
+void line(int x0, int y0, int x1, int y1) {
+  printf("%d %d %d %d %d\n", COMMAND_LINE, x0, y0, x1, y1);
+}
+
+void rect(int x, int y, int w, int h) {
+  if (w < 0) w = 0;
+  if (h < 0) h = 0;
+  printf("%d %d %d %d %d\n", COMMAND_RECT, x, y, w, h);
+}
+
+void fill(int r, int g, int b, int a = 0xff) {
+  if (r < 0) r = 0; if (r > 255) r = 255;
+  if (g < 0) g = 0; if (g > 255) g = 255;
+  if (b < 0) b = 0; if (b > 255) b = 255;
+  if (a < 0) a = 0; if (a > 255) a = 255;
+  printf("%d %d %d %d %d\n", COMMAND_FILLCOLOR, r, g, b, a);
 }
 
 void stroke(int r, int g, int b, int a = 0xff) {
@@ -164,30 +187,21 @@ void stroke(int r, int g, int b, int a = 0xff) {
   if (g < 0) g = 0; if (g > 255) g = 255;
   if (b < 0) b = 0; if (b > 255) b = 255;
   if (a < 0) a = 0; if (a > 255) a = 255;
-  printf("%c %d %d %d %d\n", COMMAND_STROKECOLOR, r, g, b, a);
+  printf("%d %d %d %d %d\n", COMMAND_STROKECOLOR, r, g, b, a);
 }
 
-void point(int x, int y) {
-  printf("%c %d %d\n", COMMAND_POINT, x, y);
-}
-
-void line(int x0, int y0, int x1, int y1) {
-  printf("%c %d %d %d %d\n", COMMAND_LINE, x0, y0, x1, y1);
-}
-
-void rect(int x, int y, int w, int h) {
-  if (w < 0) w = 0;
-  if (h < 0) h = 0;
-  printf("%c %d %d %d %d\n", COMMAND_RECT, x, y, w, h);
+void strokeThickness(int thickness) {
+  if (thickness < 0) thickness = 0;
+  printf("%d %d\n", COMMAND_STROKETHICKNESS, thickness);
 }
 
 void text(const char* t, int x, int y) {
-  printf("%c %d %d %s\n", COMMAND_TEXT, x, y, t);
+  printf("%d %d %d %s\n", COMMAND_TEXT, x, y, t);
 }
 
 void textSize(int s) {
   if (s < 0) s = 0;
-  printf("%c %d\n", COMMAND_TEXTSIZE, s);
+  printf("%d %d\n", COMMAND_TEXTSIZE, s);
 }
 
 void textColor(int r, int g, int b, int a = 0xff) {
@@ -195,17 +209,6 @@ void textColor(int r, int g, int b, int a = 0xff) {
   if (g < 0) g = 0; if (g > 255) g = 255;
   if (b < 0) b = 0; if (b > 255) b = 255;
   if (a < 0) a = 0; if (a > 255) a = 255;
-  printf("%c %d %d %d %d\n", COMMAND_TEXTCOLOR, r, g, b, a);
+  printf("%d %d %d %d %d\n", COMMAND_TEXTCOLOR, r, g, b, a);
 }
 
-// XXX(naum): Not implemented
-
-/*
-void fill(int r, int g, int b, int a = 0xff) {
-  if (r < 0) r = 0; if (r > 255) r = 255;
-  if (g < 0) g = 0; if (g > 255) g = 255;
-  if (b < 0) b = 0; if (b > 255) b = 255;
-  if (a < 0) a = 0; if (a > 255) a = 255;
-  printf("%c %d %d %d %d\n", COMMAND_FILLCOLOR, r, g, b, a);
-}
-*/

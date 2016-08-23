@@ -7,7 +7,9 @@
 
 #include <cstdio>
 #include <cstring>
+#include <cmath>
 #include <string>
+#include <algorithm>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -19,7 +21,7 @@ namespace codesketch {
 
 sf::Color fillColor = sf::Color::Black;
 sf::Color strokeColor = sf::Color::Black;
-u32 strokeSize = 1;
+float strokeThickness = 0.0f;
 
 // Subprocess
 pid_t sketchpid = 0;
@@ -128,9 +130,28 @@ void sketchReceiveData() {
       if (c == '\n') break;
     }
 
-    char type;
+    int type;
     std::istringstream cmd(data);
     cmd >> type;
+
+    /*
+    COMMAND_NOTHING,
+    COMMAND_BACKGROUND,
+
+    COMMAND_POINT,
+    COMMAND_LINE,
+    COMMAND_RECT,
+    COMMAND_CIRCLE,
+
+    COMMAND_FILLCOLOR,
+
+    COMMAND_STROKECOLOR,
+    COMMAND_STROKETHICKNESS,
+
+    COMMAND_TEXT,
+    COMMAND_TEXTSIZE,
+    COMMAND_TEXTCOLOR,
+    */
 
     if (type == COMMAND_BACKGROUND) {
       int r, g, b;
@@ -139,53 +160,132 @@ void sketchReceiveData() {
       window.clear({ (u8)r, (u8)g, (u8)b });
     }
 
-    if (type == COMMAND_STROKECOLOR) {
-      int r, g, b, a;
-      cmd >> r >> g >> b >> a;
-      strokeColor = { (u8)r, (u8)g, (u8)b, (u8)a };
-    }
-
     if (type == COMMAND_POINT) {
       int x, y;
       cmd >> x >> y;
 
-      // TODO(naum): Change point size depending on stroke size
-      sf::CircleShape point {0.5f};
+      float radius = std::max(1.0f, strokeThickness) * 0.5f;
+      sf::CircleShape point { radius };
+      point.setFillColor(strokeColor);
+      point.setOrigin(radius, radius);
       point.setPosition(x, y);
-      point.setFillColor(fillColor);
       window.draw(point);
     }
 
     if (type == COMMAND_LINE) {
       int x0, y0, x1, y1;
       cmd >> x0 >> y0 >> x1 >> y1;
-      //SDL_RenderDrawLine(renderer, x0, y0, x1, y1);
+
+      float angle = std::atan2(y1-y0, x1-x0) * 180.0f / M_PI;
+      float w = std::sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
+      float h = std::max(1.0f, strokeThickness);
+      float radius = h * 0.5f;
+
+      // Line
+      sf::RectangleShape rect { { w, h } };
+      rect.setFillColor(strokeColor);
+      rect.setOrigin(0.0f, h / 2.0f);
+      rect.setPosition(x0, y0);
+      rect.rotate(angle);
+      window.draw(rect);
+
+      // Round ends
+      sf::CircleShape circle { radius };
+      circle.setFillColor(strokeColor);
+      circle.setOrigin(radius, radius);
+      circle.setPosition(x0, y0);
+      window.draw(circle);
+
+      circle.setPosition(x1, y1);
+      window.draw(circle);
     }
 
     if (type == COMMAND_RECT) {
       int x, y, w, h;
       cmd >> x >> y >> w >> h;
-      //SDL_Rect rect = {x, y, w, h};
-      //SDL_RenderDrawRect(renderer, &rect);
+
+      sf::RectangleShape rect;
+
+      // Stroke
+      rect.setFillColor(strokeColor);
+
+      // Top
+      rect.setSize({ (float)w, strokeThickness });
+      rect.setPosition(x, y - strokeThickness);
+      window.draw(rect);
+
+      // Bottom
+      rect.setPosition(x, y + h);
+      window.draw(rect);
+
+      // Left
+      rect.setSize({ strokeThickness, (float)h });
+      rect.setPosition(x - strokeThickness, y);
+      window.draw(rect);
+
+      // Right
+      rect.setPosition(x + w, y);
+      window.draw(rect);
+
+      // Round corners
+      float radius = strokeThickness;
+      sf::CircleShape circle { radius };
+      circle.setFillColor(strokeColor);
+      circle.setOrigin(radius, radius);
+      circle.setPosition(x, y);
+      window.draw(circle);
+
+      circle.setPosition(x + w, y);
+      window.draw(circle);
+
+      circle.setPosition(x + w, y + h);
+      window.draw(circle);
+
+      circle.setPosition(x, y + h);
+      window.draw(circle);
+
+      // Fill
+      rect.setSize({ (float)w, (float)h });
+      rect.setFillColor(fillColor);
+      rect.setPosition(x, y);
+      window.draw(rect);
     }
+
+    if (type == COMMAND_STROKECOLOR) {
+      int r, g, b, a;
+      cmd >> r >> g >> b >> a;
+
+      strokeColor = { (u8)r, (u8)g, (u8)b, (u8)a };
+    }
+
+    if (type == COMMAND_STROKETHICKNESS) {
+      int t;
+      cmd >> t;
+
+      strokeThickness = t;
+    }
+
 
     if (type == COMMAND_TEXT) {
       int x, y;
       std::string text;
       cmd >> x >> y;
       getline(cmd, text);
+
       textRender(text, x, y);
     }
 
     if (type == COMMAND_TEXTSIZE) {
       int s;
       cmd >> s;
+
       textSetSize(s);
     }
 
     if (type == COMMAND_TEXTCOLOR) {
       int r, g, b, a;
       cmd >> r >> g >> b >> a;
+
       textSetColor(r, g, b, a);
     }
   }

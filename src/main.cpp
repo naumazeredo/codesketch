@@ -21,9 +21,8 @@ u8 mouseState;
 int frameCount;
 
 void init() {
-  // TODO(naum): treat errors
   // Initialize settings
-  settings.antialiasingLevel = 8;
+  //settings.antialiasingLevel = 8;
 
   // Initialize Window
   window.create(
