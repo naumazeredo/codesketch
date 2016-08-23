@@ -174,6 +174,11 @@ void rect(int x, int y, int w, int h) {
   printf("%d %d %d %d %d\n", COMMAND_RECT, x, y, w, h);
 }
 
+void circle(int x, int y, int r) {
+  if (r < 0) r = 0;
+  printf("%d %d %d %d\n", COMMAND_CIRCLE, x, y, r);
+}
+
 void fill(int r, int g, int b, int a = 0xff) {
   if (r < 0) r = 0; if (r > 255) r = 255;
   if (g < 0) g = 0; if (g > 255) g = 255;

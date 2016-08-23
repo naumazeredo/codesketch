@@ -251,6 +251,22 @@ void sketchReceiveData() {
       window.draw(rect);
     }
 
+    if (type == COMMAND_CIRCLE) {
+      int x, y, r;
+      cmd >> x >> y >> r;
+
+      float radius = r;
+      sf::CircleShape circle { radius };
+      circle.setFillColor(fillColor);
+      circle.setOrigin(radius, radius);
+      circle.setPosition(x, y);
+
+      circle.setOutlineThickness(strokeThickness);
+      circle.setOutlineColor(strokeColor);
+
+      window.draw(circle);
+    }
+
     if (type == COMMAND_FILLCOLOR) {
       int r, g, b;
       cmd >> r >> g >> b;
