@@ -7,8 +7,8 @@ sf::Color textColor = sf::Color::White;
 u32 textSize = 16;
 
 bool textInit() {
-  string path = (shellRoot / "fonts/prstartk.ttf").string();
-  if (!font.loadFromFile(path) {
+  std::string path = (shellRoot / "fonts/prstartk.ttf").string();
+  if (!font.loadFromFile(path)) {
     // TODO(naum): print error
     return false;
   }
