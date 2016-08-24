@@ -45,7 +45,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Windows porting
 - [ ] Write README blank/incomplete sections
 - [ ] IMPORTANT: parallelize subprocess reading to avoid crash
-- [ ] Add version and configuration information (instead of sending same data to
+- [ ] Add version and setup process (instead of sending same data to
     setup)
 
 ## Learning with Code Sketch
@@ -115,8 +115,7 @@ int keyPressed(int key);
 // Clear the whole screen with the color
 void background(int r, int g, int b);
 
-// Change stroke color
-void stroke(int r, int g, int b, int a);
+// Primitives
 
 // Draw a point/pixel in position (x, y)
 void point(int x, int y);
@@ -127,6 +126,25 @@ void line(int x0, int y0, int x1, int y1);
 // Draw a rectangle with upper-left corner at (x0, y0), width w and height h
 // (w and h must be positive)
 void rect(int x, int y, int w, int h);
+
+// Draw a circle with center at (x, y) and radius r
+void circle(int x, int y, int r);
+
+// Color
+
+// Change fill color
+void fill(int r, int g, int b, int a);
+
+// Stroke
+// Points will have the stroke thickness as size (min 1)
+// Lines will have the stroke thickness as height (min 1)
+// Rects and circles will have an outline with stroke thickness
+
+// Change stroke color
+void stroke(int r, int g, int b, int a);
+
+// Change stroke thickness
+void strokeThickness(int t);
 
 // Text
 
