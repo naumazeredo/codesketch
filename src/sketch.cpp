@@ -28,6 +28,15 @@ pid_t sketchpid = 0;
 int sketchin[2], sketchout[2], sketcherr[2];
 int sketchstatus = 0;
 
+inline void sketchInit() {
+  frameCount = 0;
+  fillColor = sf::Color::Black;
+  strokeColor = sf::Color::Black;
+  strokeThickness = 0.0f;
+
+  window.clear();
+}
+
 bool sketchOpen(const std::string& name) {
   // TODO(naum): treat errors
   if (pipe(sketchin) == -1) return false;
@@ -78,7 +87,7 @@ bool sketchOpen(const std::string& name) {
     return false;
   }
 
-  frameCount = 0;
+  sketchInit();
 
   usleep(1);
   return sketchIsRunning();
