@@ -20,7 +20,11 @@ u8 mouseState;
 
 int frameCount;
 
-void init() {
+fs::path binPath;
+
+void init(int argc, char** argv) {
+  binPath = fs::canonical((fs::current_path() / argv[0])).remove_filename();
+
   // Initialize settings
   //settings.antialiasingLevel = 8;
 
@@ -97,6 +101,6 @@ void run() {
 }
 
 int main(int argc, char** argv) {
-  codesketch::init();
+  codesketch::init(argc, argv);
   codesketch::run();
 }

@@ -36,6 +36,8 @@ extern u8 mouseState;
 
 extern int frameCount;
 
+extern fs::path binPath;
+
 // Text
 extern sf::Color textColor;
 extern u32 textSize;
