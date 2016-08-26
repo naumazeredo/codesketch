@@ -6,7 +6,7 @@ sf::Font font;
 u32 textSize = 16;
 
 bool textInit() {
-  std::string path = (binPath / "../fonts/prstartk.ttf").string();
+  std::string path = (binPath / "../fonts/UbuntuMono-B.ttf").string();
   if (!font.loadFromFile(path)) {
     // TODO(naum): print error
     return false;

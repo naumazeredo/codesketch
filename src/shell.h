@@ -14,12 +14,12 @@ typedef std::function<void (const std::vector<std::string>&)> ShellFn;
 namespace codesketch {
 
 // XXX(naum): remove const and do better?
-const int shellX = 20,
-          shellY = 60,
-          shellW = windowWidth - 40,
-          shellH = windowHeight - 80,
-          shellTextSize = 16,
-          shellLineH = 20;
+const int shellTextSize = 24,
+          shellLineH = shellTextSize,
+          shellX = 20,
+          shellY = 48,
+          shellW = windowWidth - 2 * shellX,
+          shellH = windowHeight - shellY - shellLineH;
 const std::string shellPS1 = "> ", shellPS2 = "- ";
 
 void shellOpLs  (const std::vector<std::string>&);

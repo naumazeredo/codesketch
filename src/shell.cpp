@@ -33,8 +33,8 @@ void shellOpLs(const std::vector<std::string>& args) {
 void shellOpCd(const std::vector<std::string>& args) {
   if (args.size() == 1) {
     fs::current_path(shellRoot);
-  } else if (fs::is_directory(fs::current_path() / args[1])) {
-    fs::current_path(fs::current_path() / args[1]);
+  } else if (fs::is_directory(args[1]) or fs::is_directory(fs::current_path() / args[1])) {
+    fs::current_path(fs::canonical(args[1]));
   } else {
     shellAddHistory("cd: no such directory");
     return;
@@ -56,7 +56,6 @@ void shellOpRun(const std::vector<std::string>& args) {
 
 void shellOpHelp(const std::vector<std::string>& args) {
   shellAddHistory(
-    "\n"
     "Code Sketch help\n"
     "\n"
     "commands:\n"
@@ -135,12 +134,14 @@ void shellParseInput() {
 }
 
 void shellDraw() {
-  textRender("Code Sketch", 20, 20, 32, sf::Color::White);
+  textRender("Code Sketch", 20, 8, 32, sf::Color::White);
 
   for (int i = 0; i < (int)shellHistory.size(); ++i) {
     std::string& history = shellHistory[i];
     if (history.length())
-      textRender(history, shellX, shellY + i * shellLineH, shellTextSize, sf::Color::White);
+      textRender(history,
+                 shellX, shellY + i * shellLineH,
+                 shellTextSize, sf::Color::White);
   }
 
   // TODO(naum): "Bye" with SFML
