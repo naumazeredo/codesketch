@@ -2,30 +2,31 @@
 #include <stdint.h>
 
 enum {
-  COMMAND_FRAMEEND,
+  _COMMAND_FRAMEEND,
 
-  COMMAND_BACKGROUND,
+  _COMMAND_BACKGROUND,
 
-  COMMAND_POINT,
-  COMMAND_LINE,
-  COMMAND_RECT,
-  COMMAND_CIRCLE,
+  _COMMAND_POINT,
+  _COMMAND_LINE,
+  _COMMAND_RECT,
+  _COMMAND_CIRCLE,
 
-  COMMAND_FILLCOLOR,
+  _COMMAND_FILLCOLOR,
 
-  COMMAND_STROKECOLOR,
-  COMMAND_STROKETHICKNESS,
+  _COMMAND_STROKECOLOR,
+  _COMMAND_STROKETHICKNESS,
 
-  COMMAND_TEXT,
-  COMMAND_TEXTSIZE,
+  _COMMAND_TEXT,
+  _COMMAND_TEXTSIZE,
 
-  COMMAND_CAMERA,
+  _COMMAND_CAMERA,
 
   // XXX(naum): Not implemented
-  COMMAND_ELLIPSE,
-  COMMAND_WINDOW,
+  _COMMAND_ELLIPSE,
+  _COMMAND_WINDOW,
+  //
 
-  COMMAND_NUM
+  _COMMAND_NUM
 };
 
 enum {
@@ -110,9 +111,9 @@ int frameCount;
 int windowWidth, windowHeight;
 int mouseX, mouseY;
 
-int mouseState_;
-char keystate_[256];
-int running_;
+int _mouseState_;
+char _keystate_[256];
+int _running_;
 
 // User declared functions
 void setup();
@@ -122,25 +123,25 @@ int main() {
   // Unbuffered stdout
   setbuf(stdout, 0);
 
-  running_ = 1;
+  _running_ = 1;
 
   // Setup
   scanf("%d %d %d %d %d %d %s",
         &frameCount,
         &windowWidth, &windowHeight,
-        &mouseX, &mouseY, &mouseState_,
-        keystate_);
+        &mouseX, &mouseY, &_mouseState_,
+        _keystate_);
   setup();
-  printf("%d\n", COMMAND_FRAMEEND);
+  printf("%d\n", _COMMAND_FRAMEEND);
 
-  while (running_ &&
+  while (_running_ &&
          scanf("%d %d %d %d %d %d %s",
                &frameCount,
                &windowWidth, &windowHeight,
-               &mouseX, &mouseY, &mouseState_,
-               keystate_) != EOF) {
+               &mouseX, &mouseY, &_mouseState_,
+               _keystate_) != EOF) {
     draw();
-    printf("%d\n", COMMAND_FRAMEEND);
+    printf("%d\n", _COMMAND_FRAMEEND);
   }
 
   return 0;
@@ -150,11 +151,11 @@ int main() {
 int mousePressed(int button) {
   if (button >= MOUSE_NUM or button < 0)
     return 0;
-  return mouseState_ & (1<<button);
+  return _mouseState_ & (1<<button);
 }
 
 int keydown_(int key) {
-  return keystate_[key]-'0';
+  return _keystate_[key]-'0';
 }
 
 int keyPressed(int key) {
@@ -170,26 +171,26 @@ void background(int r, int g, int b) {
   if (r < 0) r = 0; if (r > 255) r = 255;
   if (g < 0) g = 0; if (g > 255) g = 255;
   if (b < 0) b = 0; if (b > 255) b = 255;
-  printf("%d %d %d %d\n", COMMAND_BACKGROUND, r, g, b);
+  printf("%d %d %d %d\n", _COMMAND_BACKGROUND, r, g, b);
 }
 
 void point(int x, int y) {
-  printf("%d %d %d\n", COMMAND_POINT, x, y);
+  printf("%d %d %d\n", _COMMAND_POINT, x, y);
 }
 
 void line(int x0, int y0, int x1, int y1) {
-  printf("%d %d %d %d %d\n", COMMAND_LINE, x0, y0, x1, y1);
+  printf("%d %d %d %d %d\n", _COMMAND_LINE, x0, y0, x1, y1);
 }
 
 void rect(int x, int y, int w, int h) {
   if (w < 0) w = 0;
   if (h < 0) h = 0;
-  printf("%d %d %d %d %d\n", COMMAND_RECT, x, y, w, h);
+  printf("%d %d %d %d %d\n", _COMMAND_RECT, x, y, w, h);
 }
 
 void circle(int x, int y, int r) {
   if (r < 0) r = 0;
-  printf("%d %d %d %d\n", COMMAND_CIRCLE, x, y, r);
+  printf("%d %d %d %d\n", _COMMAND_CIRCLE, x, y, r);
 }
 
 void fill(int r, int g, int b, int a = 0xff) {
@@ -197,7 +198,7 @@ void fill(int r, int g, int b, int a = 0xff) {
   if (g < 0) g = 0; if (g > 255) g = 255;
   if (b < 0) b = 0; if (b > 255) b = 255;
   if (a < 0) a = 0; if (a > 255) a = 255;
-  printf("%d %d %d %d %d\n", COMMAND_FILLCOLOR, r, g, b, a);
+  printf("%d %d %d %d %d\n", _COMMAND_FILLCOLOR, r, g, b, a);
 }
 
 void stroke(int r, int g, int b, int a = 0xff) {
@@ -205,27 +206,27 @@ void stroke(int r, int g, int b, int a = 0xff) {
   if (g < 0) g = 0; if (g > 255) g = 255;
   if (b < 0) b = 0; if (b > 255) b = 255;
   if (a < 0) a = 0; if (a > 255) a = 255;
-  printf("%d %d %d %d %d\n", COMMAND_STROKECOLOR, r, g, b, a);
+  printf("%d %d %d %d %d\n", _COMMAND_STROKECOLOR, r, g, b, a);
 }
 
 void strokeThickness(int thickness) {
   if (thickness < 0) thickness = 0;
-  printf("%d %d\n", COMMAND_STROKETHICKNESS, thickness);
+  printf("%d %d\n", _COMMAND_STROKETHICKNESS, thickness);
 }
 
 void text(const char* t, int x, int y) {
-  printf("%d %d %d %s\n", COMMAND_TEXT, x, y, t);
+  printf("%d %d %d %s\n", _COMMAND_TEXT, x, y, t);
 }
 
 void textSize(int s) {
   if (s < 0) s = 0;
-  printf("%d %d\n", COMMAND_TEXTSIZE, s);
+  printf("%d %d\n", _COMMAND_TEXTSIZE, s);
 }
 
 void camera(int x, int y) {
-  printf("%d %d %d\n", COMMAND_CAMERA, x, y);
+  printf("%d %d %d\n", _COMMAND_CAMERA, x, y);
 }
 
 void exit() {
-  running_ = 0;
+  _running_ = 0;
 }
