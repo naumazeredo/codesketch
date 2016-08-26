@@ -1,15 +1,6 @@
-#include "shell.h"
-
-#include <cstdio>
-
-#include <experimental/filesystem>
-#include <array>
-#include <string>
-#include <vector>
 #include <sstream>
-#include <functional>
-#include <utility>
 
+#include "shell.h"
 #include "externs.h"
 #include "sketch.h"
 #include "text.h"
@@ -59,7 +50,7 @@ void shellOpRun(const std::vector<std::string>& args) {
   }
 
   fs::path run_path = fs::current_path() / args[1];
-  if (fs::is_regular_file(run_path)) sketchOpen(run_path);
+  if (fs::is_regular_file(run_path)) sketchOpen(run_path.string());
   else shellAddHistory("run: no such file\n");
 }
 

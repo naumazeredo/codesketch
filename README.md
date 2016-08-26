@@ -47,11 +47,12 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
     setup)
 - [ ] Verify if sketch is running suboptimally (may happen with large input)
 
-## Dependencies
-
-`$ sudo apt-get install libsfml-dev libboost-all-dev`
-
 ## Learning with Code Sketch
+
+### Install dependencies
+
+SFML: `$ sudo apt-get install libsfml-graphics2.3v5 libsfml-window2.3v5`
+Boost Filesystem: `$ sudo apt-get install libboost-filesystem1.58`
 
 ### Begin to code
 
@@ -177,7 +178,8 @@ Happy coding!
 
 ### Dependencies
 
-SFML libs: `sudo apt install libsfml-dev`
+SFML: `sudo apt install libsfml-dev`
+Boost Filesystem: `sudo apt install libboost-filesystem-dev`
 
 ## Known bugs
 

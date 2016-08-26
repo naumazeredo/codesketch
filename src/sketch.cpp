@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+
+#include <sstream>
 #include <string>
 #include <algorithm>
 

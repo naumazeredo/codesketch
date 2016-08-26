@@ -2,12 +2,11 @@
 #define CODESKETCH_CORE_EXTERNS_H
 
 #include <cstdint>
-#include <map>
-#include <experimental/filesystem>
+#include <boost/filesystem.hpp>
 
 #include <SFML/Graphics.hpp>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = boost::filesystem;
 
 // Int types
 typedef int8_t   i8;

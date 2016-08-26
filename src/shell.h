@@ -1,7 +1,6 @@
 #ifndef CODESKETCH_CORE_SHELL_H
 #define CODESKETCH_CORE_SHELL_H
 
-#include <experimental/filesystem>
 #include <array>
 #include <string>
 #include <vector>
