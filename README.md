@@ -154,6 +154,11 @@ void text(const char* t, int x, int y);
 
 // Change text size (s must be positive)
 void textSize(int s);
+
+// Exit
+
+// Terminate sketch execution
+void exit();
 ```
 
 See examples in *sketches* folder if you have any doubts on how to use the API.

@@ -21,11 +21,8 @@ enum {
 
   // XXX(naum): Not implemented
   COMMAND_ELLIPSE,
-
   COMMAND_CAMERA,
   COMMAND_WINDOW,
-
-  COMMAND_EXIT,
 
   COMMAND_NUM
 };
@@ -101,8 +98,10 @@ enum {
 int frameCount;
 int windowWidth, windowHeight;
 int mouseX, mouseY;
+
 int mouseState_;
 char keystate_[256];
+int running_;
 
 // User declared functions
 void setup();
@@ -111,6 +110,8 @@ void draw();
 int main() {
   // Unbuffered stdout
   setbuf(stdout, 0);
+
+  running_ = 1;
 
   // Setup
   scanf("%d %d %d %d %d %d %s",
@@ -121,7 +122,8 @@ int main() {
   setup();
   printf("%d\n", COMMAND_FRAMEEND);
 
-  while (scanf("%d %d %d %d %d %d %s",
+  while (running_ &&
+         scanf("%d %d %d %d %d %d %s",
                &frameCount,
                &windowWidth, &windowHeight,
                &mouseX, &mouseY, &mouseState_,
@@ -209,4 +211,8 @@ void text(const char* t, int x, int y) {
 void textSize(int s) {
   if (s < 0) s = 0;
   printf("%d %d\n", COMMAND_TEXTSIZE, s);
+}
+
+void exit() {
+  running_ = 0;
 }
