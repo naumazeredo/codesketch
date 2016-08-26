@@ -17,5 +17,5 @@ void draw() {
 
   textColor(r, g, b);
 
-  text("Code Sketch with text!", 20);
+  text("Code Sketch with text!", 20, frameCount % (windowHeight+20) - 20);
 }
