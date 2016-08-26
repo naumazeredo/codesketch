@@ -80,7 +80,8 @@ const sf::Keyboard::Key keys[] = {
 const int keysSize = sizeof(keys)/sizeof(keys[0]);
 
 enum {
-  COMMAND_NOTHING,
+  COMMAND_FRAMEEND,
+
   COMMAND_BACKGROUND,
 
   COMMAND_POINT,
@@ -111,8 +112,7 @@ enum {
 bool sketchOpen(const std::string&);
 void sketchClose();
 bool sketchIsRunning();
-void sketchSendData();
-void sketchReceiveData();
+void sketchRun();
 
 }
 

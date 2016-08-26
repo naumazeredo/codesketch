@@ -19,6 +19,7 @@
 
 namespace codesketch {
 
+// Sketch variables
 sf::Color fillColor = sf::Color::Black;
 sf::Color strokeColor = sf::Color::Black;
 float strokeThickness = 0.0f;
@@ -26,7 +27,7 @@ float strokeThickness = 0.0f;
 // Subprocess
 pid_t sketchpid = 0;
 int sketchin[2], sketchout[2], sketcherr[2];
-int sketchstatus = 0;
+int sketchStatus = 0;
 
 inline void sketchInit() {
   frameCount = 0;
@@ -70,10 +71,10 @@ bool sketchOpen(const std::string& name) {
     close(sketchout[WRITE]);
     close(sketcherr[WRITE]);
 
-    fcntl(sketchout[READ], F_SETFL, fcntl(sketchout[READ], F_GETFL, 0) | O_NONBLOCK);
-    fcntl(sketcherr[READ], F_SETFL, fcntl(sketcherr[READ], F_GETFL, 0) | O_NONBLOCK);
+    //fcntl(sketchout[READ], F_SETFL, fcntl(sketchout[READ], F_GETFL, 0) | O_NONBLOCK);
+    //fcntl(sketcherr[READ], F_SETFL, fcntl(sketcherr[READ], F_GETFL, 0) | O_NONBLOCK);
 
-    fcntl(sketchout[READ], F_SETPIPE_SZ, 1048576);
+    //fcntl(sketchout[READ], F_SETPIPE_SZ, 1048576);
   } else {
     // Error
 
@@ -89,7 +90,6 @@ bool sketchOpen(const std::string& name) {
 
   sketchInit();
 
-  usleep(1);
   return sketchIsRunning();
 }
 
@@ -104,8 +104,8 @@ void sketchClose() {
 }
 
 bool sketchIsRunning() {
-  sketchstatus = 0;
-  if (sketchpid == 0 or waitpid(sketchpid, &sketchstatus, WNOHANG) != 0) {
+  sketchStatus = 0;
+  if (sketchpid == 0 or waitpid(sketchpid, &sketchStatus, WNOHANG) != 0) {
     sketchpid = 0;
     return false;
   }
@@ -113,35 +113,27 @@ bool sketchIsRunning() {
   return true;
 }
 
-void sketchSendData() {
-  char keysstr[keysSize+1] = {};
-  for (unsigned i = 0; i < keysSize; ++i)
-    keysstr[i] = '0'+sf::Keyboard::isKeyPressed(keys[i]);
-
-  char data[1024];
-  sprintf(data, "%d %d %d %d %d %d %s\n",
-          frameCount, windowWidth, windowHeight, mouseX, mouseY, mouseState, keysstr);
-
-  write(sketchin[WRITE], data, strlen(data));
-}
-
-void sketchReceiveData() {
-  // TODO IMPORTANT(naum): Multithread this
+inline void sketchReceiveData() {
   std::string data;
 
-  while (1) {
+  while (sketchIsRunning()) {
     data = "";
-    while (1) {
-      char c;
-      int bytesread = read(sketchout[READ], &c, 1);
-      if (bytesread <= 0) return;
-      data += c;
-      if (c == '\n') break;
-    }
 
-    int type;
+    char c;
+    int bytesread;
+    while ((bytesread = read(sketchout[READ], &c, 1)) > 0 and c != '\n')
+      data += c;
+
+    // Error reading pipe or end of file
+    if (bytesread <= 0)
+      break;
+
     std::istringstream cmd(data);
+    int type;
     cmd >> type;
+
+    if (type == COMMAND_FRAMEEND)
+      break;
 
     if (type == COMMAND_BACKGROUND) {
       int r, g, b;
@@ -159,6 +151,7 @@ void sketchReceiveData() {
       point.setFillColor(strokeColor);
       point.setOrigin(radius, radius);
       point.setPosition(x, y);
+
       window.draw(point);
     }
 
@@ -172,72 +165,73 @@ void sketchReceiveData() {
       float radius = h * 0.5f;
 
       // Line
-      sf::RectangleShape rect { { w, h } };
-      rect.setFillColor(strokeColor);
-      rect.setOrigin(0.0f, h / 2.0f);
-      rect.setPosition(x0, y0);
-      rect.rotate(angle);
-      window.draw(rect);
+      sf::RectangleShape line { { w, h } };
+      line.setFillColor(strokeColor);
+      line.setOrigin(0.0f, h / 2.0f);
+      line.setPosition(x0, y0);
+      line.rotate(angle);
 
       // Round ends
-      sf::CircleShape circle { radius };
-      circle.setFillColor(strokeColor);
-      circle.setOrigin(radius, radius);
-      circle.setPosition(x0, y0);
-      window.draw(circle);
+      sf::CircleShape end0 { radius };
+      end0.setFillColor(strokeColor);
+      end0.setOrigin(radius, radius);
+      end0.setPosition(x0, y0);
 
-      circle.setPosition(x1, y1);
-      window.draw(circle);
+      sf::CircleShape end1 { radius };
+      end1.setFillColor(strokeColor);
+      end1.setOrigin(radius, radius);
+      end1.setPosition(x1, y1);
+
+      window.draw(line);
+      window.draw(end0);
+      window.draw(end1);
     }
 
     if (type == COMMAND_RECT) {
       int x, y, w, h;
       cmd >> x >> y >> w >> h;
 
-      sf::RectangleShape rect;
+      sf::RectangleShape rect, strokes[4];
+      sf::CircleShape corners[4];
 
       // Stroke
-      rect.setFillColor(strokeColor);
+      for (int i = 0; i < 4; ++i)
+        strokes[i].setFillColor(strokeColor);
 
       // Top
-      rect.setSize({ (float)w, strokeThickness });
-      rect.setPosition(x, y - strokeThickness);
-      window.draw(rect);
+      strokes[0].setSize({ (float)w, strokeThickness });
+      strokes[0].setPosition(x, y - strokeThickness);
 
       // Bottom
-      rect.setPosition(x, y + h);
-      window.draw(rect);
+      strokes[1].setSize({ (float)w, strokeThickness });
+      strokes[1].setPosition(x, y + h);
 
       // Left
-      rect.setSize({ strokeThickness, (float)h });
-      rect.setPosition(x - strokeThickness, y);
-      window.draw(rect);
+      strokes[2].setSize({ strokeThickness, (float)h });
+      strokes[2].setPosition(x - strokeThickness, y);
 
       // Right
-      rect.setPosition(x + w, y);
-      window.draw(rect);
+      strokes[3].setSize({ strokeThickness, (float)h });
+      strokes[3].setPosition(x + w, y);
 
       // Round corners
       float radius = strokeThickness;
-      sf::CircleShape circle { radius };
-      circle.setFillColor(strokeColor);
-      circle.setOrigin(radius, radius);
-      circle.setPosition(x, y);
-      window.draw(circle);
-
-      circle.setPosition(x + w, y);
-      window.draw(circle);
-
-      circle.setPosition(x + w, y + h);
-      window.draw(circle);
-
-      circle.setPosition(x, y + h);
-      window.draw(circle);
+      for (int i = 0; i < 4; ++i) {
+        corners[i].setRadius(radius);
+        corners[i].setFillColor(strokeColor);
+        corners[i].setOrigin(radius, radius);
+        corners[i].setPosition(x + (i % 2) * w, y + (i / 2) * h);
+      }
 
       // Fill
       rect.setSize({ (float)w, (float)h });
       rect.setFillColor(fillColor);
       rect.setPosition(x, y);
+
+      for (int i = 0; i < 4; ++i) {
+        window.draw(strokes[i]);
+        window.draw(corners[i]);
+      }
       window.draw(rect);
     }
 
@@ -302,6 +296,24 @@ void sketchReceiveData() {
       textSetColor(r, g, b, a);
     }
   }
+}
+
+inline void sketchSendData() {
+  char keysstr[keysSize+1] = {};
+  for (unsigned i = 0; i < keysSize; ++i)
+    keysstr[i] = '0'+sf::Keyboard::isKeyPressed(keys[i]);
+
+  char data[1024];
+  sprintf(data, "%d %d %d %d %d %d %s\n",
+          frameCount, windowWidth, windowHeight, mouseX, mouseY, mouseState, keysstr);
+
+  write(sketchin[WRITE], data, strlen(data));
+  frameCount++;
+}
+
+void sketchRun() {
+  sketchSendData();
+  sketchReceiveData();
 }
 
 }
