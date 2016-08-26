@@ -3,7 +3,6 @@
 namespace codesketch {
 
 sf::Font font;
-sf::Color textColor = sf::Color::White;
 u32 textSize = 16;
 
 bool textInit() {
@@ -24,10 +23,6 @@ void textRender(const std::string& text, int x, int y, u32 size, sf::Color color
 
 void textSetSize(u32 size) {
   textSize = size;
-}
-
-void textSetColor(u8 r, u8 g, u8 b, u8 a) {
-  textColor = {r, g, b, a};
 }
 
 }

@@ -18,7 +18,6 @@ enum {
 
   COMMAND_TEXT,
   COMMAND_TEXTSIZE,
-  COMMAND_TEXTCOLOR,
 
   // XXX(naum): Not implemented
   COMMAND_ELLIPSE,
@@ -27,7 +26,6 @@ enum {
   COMMAND_WINDOW,
 
   COMMAND_EXIT,
-
 
   COMMAND_NUM
 };
@@ -212,12 +210,3 @@ void textSize(int s) {
   if (s < 0) s = 0;
   printf("%d %d\n", COMMAND_TEXTSIZE, s);
 }
-
-void textColor(int r, int g, int b, int a = 0xff) {
-  if (r < 0) r = 0; if (r > 255) r = 255;
-  if (g < 0) g = 0; if (g > 255) g = 255;
-  if (b < 0) b = 0; if (b > 255) b = 255;
-  if (a < 0) a = 0; if (a > 255) a = 255;
-  printf("%d %d %d %d %d\n", COMMAND_TEXTCOLOR, r, g, b, a);
-}
-

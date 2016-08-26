@@ -290,13 +290,6 @@ inline void sketchReceiveData() {
 
       textSetSize(s);
     }
-
-    if (type == COMMAND_TEXTCOLOR) {
-      int r, g, b, a;
-      cmd >> r >> g >> b >> a;
-
-      textSetColor(r, g, b, a);
-    }
   }
 }
 

@@ -44,6 +44,9 @@ extern u32 textSize;
 extern fs::path shellRoot;
 extern std::string shellInput;
 
+// Sketch
+extern sf::Color fillColor;
+
 }
 
 #endif

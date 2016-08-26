@@ -96,7 +96,6 @@ enum {
 
   COMMAND_TEXT,
   COMMAND_TEXTSIZE,
-  COMMAND_TEXTCOLOR,
 
   // XXX(naum): Not implemented
   COMMAND_ELLIPSE,

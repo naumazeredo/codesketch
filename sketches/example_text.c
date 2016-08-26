@@ -15,7 +15,7 @@ void draw() {
   int g = sin(frequency * frameCount + 2) * 127 + 128;
   int b = sin(frequency * frameCount + 4) * 127 + 128;
 
-  textColor(r, g, b);
+  fill(r, g, b);
 
   text("Code Sketch with text!", 20, frameCount % (windowHeight+20) - 20);
 }

@@ -11,9 +11,8 @@ namespace codesketch {
 
 bool textInit();
 void textQuit();
-void textRender(const std::string&, int, int, u32 size = textSize, sf::Color color = textColor);
+void textRender(const std::string&, int, int, u32 size = textSize, sf::Color color = fillColor);
 void textSetSize(u32);
-void textSetColor(u8 r, u8 g, u8 b, u8 a);
 
 }
 
