@@ -148,23 +148,23 @@ int main() {
 }
 
 // Mouse and keyboard
-int mousePressed(int button) {
+int mouseDown(int button) {
   if (button >= MOUSE_NUM or button < 0)
     return 0;
   return _mouseState_ & (1<<button);
 }
 
-int keydown_(int key) {
+int _keydown_(int key) {
   return _keystate_[key]-'0';
 }
 
-int keyPressed(int key) {
+int keyDown(int key) {
   if (key < 0 or key >= KEY_NUM) return false;
 
-  if (key == KEY_SHIFT) return keydown_(KEY_LSHIFT) | keydown_(KEY_RSHIFT);
-  if (key == KEY_CTRL) return keydown_(KEY_LCTRL) | keydown_(KEY_RCTRL);
-  if (key == KEY_ALT) return keydown_(KEY_LALT) | keydown_(KEY_RALT);
-  return keydown_(key);
+  if (key == KEY_SHIFT) return _keydown_(KEY_LSHIFT) | _keydown_(KEY_RSHIFT);
+  if (key == KEY_CTRL) return _keydown_(KEY_LCTRL) | _keydown_(KEY_RCTRL);
+  if (key == KEY_ALT) return _keydown_(KEY_LALT) | _keydown_(KEY_RALT);
+  return _keydown_(key);
 }
 
 void background(int r, int g, int b) {

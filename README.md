@@ -46,6 +46,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Shell
   - [x] Basic commands
   - [ ] Text wrapping
+  - [ ] Cursor
   - [ ] Colors (?)
   - [ ] Better font (?)
 - [ ] Window resizing (?)
@@ -53,6 +54,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Add version and setup process (instead of sending same data to setup)
 - [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
   with large input)
+- [ ] Release binaries with exclusive README
 
 ## Learning with Code Sketch
 
@@ -97,22 +99,25 @@ int windowWidth, windowHeight;
 // Mouse position
 int mouseX, mouseY;
 
-// Mouse buttons
-// Verify if a mouse button is pressed.
+// Mouse
+
+// Verify if a mouse button is held pressed.
+// return 0 if is up, > 0 otherwise.
 // Buttons:
 // MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE,
 // MOUSE_X1, MOUSE_X2
-int mousePressed(int button);
+int mouseDown(int button);
 
 // Keyboard
-// Verify if key is pressed
-// return 1 if is pressed, 0 otherwise
+
+// Verify if key is held down.
+// return 0 if is up, > 0 otherwise.
 // Keys:
 // KEY_A ~ KEY_Z, KEY_0 ~ KEY_9, KEY_F1 ~ KEY_F12
 // KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
 // KEY_RETURN, KEY_BACKSPACE, KEY_SPACE, KEY_DELETE
 // KEY_SHIFT, KEY_CTRL
-int keyPressed(int key);
+int keyDown(int key);
 
 // Drawing
 

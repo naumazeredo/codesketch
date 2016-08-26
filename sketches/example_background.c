@@ -5,7 +5,8 @@
 int r = 0, g = 0, b = 0;
 
 void setup() {
-  textSize(12);
+  textSize(20);
+  fill(255, 255, 255);
 }
 
 void draw() {
@@ -18,12 +19,12 @@ void draw() {
   sprintf(buffer, "Color: #%02X%02X%02X", r, g, b);
   text(buffer, 20, 80);
 
-  if (keyPressed(KEY_Q)) r++;
-  if (keyPressed(KEY_A)) r--;
-  if (keyPressed(KEY_W)) g++;
-  if (keyPressed(KEY_S)) g--;
-  if (keyPressed(KEY_E)) b++;
-  if (keyPressed(KEY_D)) b--;
+  if (keyDown(KEY_Q)) r++;
+  if (keyDown(KEY_A)) r--;
+  if (keyDown(KEY_W)) g++;
+  if (keyDown(KEY_S)) g--;
+  if (keyDown(KEY_E)) b++;
+  if (keyDown(KEY_D)) b--;
 
   if (r > 255) r = 255;
   if (r < 0) r = 0;
