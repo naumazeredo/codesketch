@@ -80,13 +80,10 @@ void run() {
 
     if (sketchIsRunning()) {
       // If sketch is running, I/O the sketch
-      sketchSendData();
-      sketchReceiveData();
-      frameCount++;
+      sketchRun();
     } else {
       // If sketch is not running, show the shell
       window.clear();
-
       shellDraw();
     }
 

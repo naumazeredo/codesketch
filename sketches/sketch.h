@@ -2,7 +2,8 @@
 #include <stdint.h>
 
 enum {
-  COMMAND_NOTHING,
+  COMMAND_FRAMEEND,
+
   COMMAND_BACKGROUND,
 
   COMMAND_POINT,
@@ -26,6 +27,7 @@ enum {
   COMMAND_WINDOW,
 
   COMMAND_EXIT,
+
 
   COMMAND_NUM
 };
@@ -119,6 +121,7 @@ int main() {
         &mouseX, &mouseY, &mouseState_,
         keystate_);
   setup();
+  printf("%d\n", COMMAND_FRAMEEND);
 
   while (scanf("%d %d %d %d %d %d %s",
                &frameCount,
@@ -126,6 +129,7 @@ int main() {
                &mouseX, &mouseY, &mouseState_,
                keystate_) != EOF) {
     draw();
+    printf("%d\n", COMMAND_FRAMEEND);
   }
 
   return 0;

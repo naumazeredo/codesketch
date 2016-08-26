@@ -2,9 +2,8 @@
 #define CODESKETCH_CORE_EXTERNS_H
 
 #include <cstdint>
-#include <experimental/filesystem>
-
 #include <map>
+#include <experimental/filesystem>
 
 #include <SFML/Graphics.hpp>
 

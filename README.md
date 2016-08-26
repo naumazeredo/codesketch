@@ -43,10 +43,9 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Camera functionality
 - [ ] Implement window resizing (?)
 - [ ] Windows porting
-- [ ] Write README blank/incomplete sections
-- [ ] IMPORTANT: parallelize subprocess reading to avoid crash
 - [ ] Add version and setup process (instead of sending same data to
     setup)
+- [ ] Verify if sketch is running suboptimally (may happen with large input)
 
 ## Learning with Code Sketch
 
@@ -184,5 +183,4 @@ SFML libs: `sudo apt install libsfml-dev`
 
 ## Known bugs
 
-- When pipe reaches the size limit program stops working. Solution: parallelize
-    subprocess reading
+- May run suboptimally in case of large inputs.
