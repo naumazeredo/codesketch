@@ -19,9 +19,10 @@ enum {
   COMMAND_TEXT,
   COMMAND_TEXTSIZE,
 
+  COMMAND_CAMERA,
+
   // XXX(naum): Not implemented
   COMMAND_ELLIPSE,
-  COMMAND_CAMERA,
   COMMAND_WINDOW,
 
   COMMAND_NUM
@@ -211,6 +212,10 @@ void text(const char* t, int x, int y) {
 void textSize(int s) {
   if (s < 0) s = 0;
   printf("%d %d\n", COMMAND_TEXTSIZE, s);
+}
+
+void camera(int x, int y) {
+  printf("%d %d %d\n", COMMAND_CAMERA, x, y);
 }
 
 void exit() {

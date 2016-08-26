@@ -290,6 +290,15 @@ inline void sketchReceiveData() {
 
       textSetSize(s);
     }
+
+    if (type == COMMAND_CAMERA) {
+      int x, y;
+      cmd >> x >> y;
+
+      auto view = window.getView();
+      view.setCenter(x + windowWidth / 2.0f, y + windowHeight / 2.0f);
+      window.setView(view);
+    }
   }
 }
 

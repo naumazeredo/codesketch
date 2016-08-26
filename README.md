@@ -40,12 +40,13 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
   - [x] Rectangles
   - [x] Circles
   - [ ] Ellipses (?)
-- [ ] Camera functionality
+- [x] Camera functionality
+  - [ ] Move camera without updating drawing should work as expected
 - [ ] Implement window resizing (?)
-- [ ] Windows porting
+- [ ] Port to Windows
 - [ ] Add version and setup process (instead of sending same data to
     setup)
-- [ ] Verify if sketch is running suboptimally (may happen with large input)
+- [ ] Verify if sketch is running suboptimally (less than 60fps. May happen with large input)
 
 ## Learning with Code Sketch
 
@@ -154,6 +155,13 @@ void text(const char* t, int x, int y);
 
 // Change text size (s must be positive)
 void textSize(int s);
+
+// Camera
+
+// Move top-left camera corner to (x, y). Starts at (0, 0)
+// (note: moving camera without sending drawing don't work as you would expect.
+// This will probably be modified in the future.)
+void camera(int x, int y);
 
 // Exit
 
