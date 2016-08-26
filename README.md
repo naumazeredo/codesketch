@@ -59,6 +59,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 ### Install dependencies
 
 SFML: `$ sudo apt-get install libsfml-system2.3v5 libsfml-graphics2.3v5 libsfml-window2.3v5`
+
 Boost Filesystem: `$ sudo apt-get install libboost-filesystem1.58`
 
 ### Begin to code
@@ -196,6 +197,7 @@ Happy coding!
 ### Dependencies
 
 SFML: `sudo apt install libsfml-dev`
+
 Boost Filesystem: `sudo apt install libboost-filesystem-dev`
 
 ## Known bugs
