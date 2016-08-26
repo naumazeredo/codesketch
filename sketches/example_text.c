@@ -5,7 +5,7 @@
 float frequency = 0.03f;
 
 void setup() {
-  textSize(20);
+  textSize(32);
 }
 
 void draw() {
