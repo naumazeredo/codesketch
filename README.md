@@ -41,13 +41,13 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
   - [x] Circles
   - [ ] Ellipses (?)
 - [x] Camera functionality
-  - [ ] Move camera without updating drawing should work as expected
+  - [ ] Move camera without redrawing everything to work
 - [ ] Drawing rotate/scale/zoom
 - [ ] Shell
   - [x] Basic commands
   - [ ] Text wrapping
   - [ ] Colors (?)
-  - [ ] Better font
+  - [ ] Better font (?)
 - [ ] Window resizing (?)
 - [ ] Port to Windows
 - [ ] Add version and setup process (instead of sending same data to setup)
