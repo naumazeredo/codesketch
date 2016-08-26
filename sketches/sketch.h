@@ -96,6 +96,16 @@ enum {
   KEY_NUM
 };
 
+enum {
+  MOUSE_LEFT,
+  MOUSE_RIGHT,
+  MOUSE_MIDDLE,
+  MOUSE_X1,
+  MOUSE_X2,
+
+  MOUSE_NUM
+};
+
 int frameCount;
 int windowWidth, windowHeight;
 int mouseX, mouseY;
@@ -137,12 +147,10 @@ int main() {
 }
 
 // Mouse and keyboard
-int mousePressedLeft() {
-  return !!(mouseState_ & 1);
-}
-
-int mousePressedRight() {
-  return !!(mouseState_ & 2);
+int mousePressed(int button) {
+  if (button >= MOUSE_NUM or button < 0)
+    return 0;
+  return mouseState_ & (1<<button);
 }
 
 int keydown_(int key) {

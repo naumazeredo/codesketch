@@ -75,16 +75,15 @@ void setup() {
 void draw() {
 }
 ```
-Your sketch **must** declare `void setup()` and `void draw()` functions, and
-that's the only restriction!
+Your sketch **must** declare `void setup()` and `void draw()` functions.
 
-`setup` function is called only once when your sketch loads;
+`setup` function is called only once when your sketch loads.
 
 `draw` function is called every update (usually 60 times per second).
 
 You have access to a Code Sketch exclusive API and to everything you need from
-C/C++ libraries. **The only thing you can't do input and output, since Code
-Sketch uses this to communicate between Code Sketch and your sketch**.
+C/C++ libraries. **The only thing you can't do is input and output. Code Sketch
+uses standard I/O to communicate between Code Sketch and your sketch**.
 
 #### API
 
@@ -99,10 +98,11 @@ int windowWidth, windowHeight;
 int mouseX, mouseY;
 
 // Mouse buttons
-// Verify if mouse button (left or right) are pressed.
-// return 1 if is pressed, 0 otherwise
-int mousePressedLeft();
-int mousePressedRight();
+// Verify if a mouse button is pressed.
+// Buttons:
+// MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE,
+// MOUSE_X1, MOUSE_X2
+int mousePressed(int button);
 
 // Keyboard
 // Verify if key is pressed

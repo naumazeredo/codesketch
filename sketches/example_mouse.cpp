@@ -18,7 +18,7 @@ void draw() {
 
   line(x.back(), y.back(), mouseX, mouseY);
 
-  if (mousePressedLeft()) {
+  if (mousePressed(MOUSE_LEFT)) {
     x.push_back(mouseX);
     y.push_back(mouseY);
   }
