@@ -42,8 +42,13 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
   - [ ] Ellipses (?)
 - [x] Camera functionality
   - [ ] Move camera without updating drawing should work as expected
-- [ ] Rotate/Scale/Zoom
-- [ ] Implement window resizing (?)
+- [ ] Drawing rotate/scale/zoom
+- [ ] Shell
+  - [x] Basic commands
+  - [ ] Text wrapping
+  - [ ] Colors (?)
+  - [ ] Better font
+- [ ] Window resizing (?)
 - [ ] Port to Windows
 - [ ] Add version and setup process (instead of sending same data to setup)
 - [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
