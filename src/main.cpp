@@ -29,7 +29,7 @@ void init(int argc, char** argv) {
   window.create(
     sf::VideoMode(windowWidth, windowHeight),
     "CodeSketch",
-    sf::Style::Default,
+    sf::Style::Titlebar | sf::Style::Close,
     settings
   );
 
