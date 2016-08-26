@@ -47,11 +47,11 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
     setup)
 - [ ] Verify if sketch is running suboptimally (may happen with large input)
 
+## Dependencies
+
+`$ sudo apt-get install libsfml-dev libboost-all-dev`
+
 ## Learning with Code Sketch
-
-### Install Dependencies
-
-`$ sudo apt-get install libsfml-dev`
 
 ### Begin to code
 
@@ -176,8 +176,6 @@ Happy coding!
 ## Contributing
 
 ### Dependencies
-
-GCC>=6.1 (or some C++ compiler with C++1z File System support): http://askubuntu.com/questions/746369/how-can-i-install-and-use-gcc-6-on-xenial
 
 SFML libs: `sudo apt install libsfml-dev`
 

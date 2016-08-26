@@ -1,6 +1,6 @@
-CC=g++-6
-LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lstdc++fs
-OPTS=-Wall -std=c++1z
+CC=g++
+LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system -lboost_filesystem
+OPTS=-Wall -std=c++11
 
 EXE=bin/codesketch.out
 SRCS=src/main.cpp src/text.cpp src/shell.cpp src/sketch.cpp
