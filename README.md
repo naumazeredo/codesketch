@@ -149,13 +149,11 @@ void strokeThickness(int t);
 // Text
 
 // Render text t with upper-left corner at (x, y)
+// The text will have the fill color as it's color
 void text(const char* t, int x, int y);
 
 // Change text size (s must be positive)
 void textSize(int s);
-
-// Change text color
-void textColor(int r, int g, int b, int a);
 ```
 
 See examples in *sketches* folder if you have any doubts on how to use the API.
