@@ -18,7 +18,7 @@ noticed are:
 - No visual feedback
 - Too many lines for very basic programs
 - Too many library includes for very basic programs
-- Very mechanical and little creative
+- Too mechanical and little creative
 
 So, the usual programming learning environment seems to discourage students
 instead of motivating them. Of course many still love from the very beginning,
@@ -45,9 +45,9 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Rotate/Scale/Zoom
 - [ ] Implement window resizing (?)
 - [ ] Port to Windows
-- [ ] Add version and setup process (instead of sending same data to
-    setup)
-- [ ] Verify if sketch is running suboptimally (less than 60fps. May happen with large input)
+- [ ] Add version and setup process (instead of sending same data to setup)
+- [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
+  with large input)
 
 ## Learning with Code Sketch
 
