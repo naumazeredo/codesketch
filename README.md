@@ -34,7 +34,7 @@ shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/co
 
 ![Shell help]( https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/help.png)
 
-![Example](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/codesketch.png)
+![Example](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/example_logo.png)
 
 ## TODO
 
