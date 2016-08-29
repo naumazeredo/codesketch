@@ -46,6 +46,7 @@ extern std::string shellInput;
 
 // Sketch
 extern sf::Color fillColor;
+extern fs::path sketchPath;
 
 }
 

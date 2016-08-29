@@ -49,6 +49,32 @@ void run() {
       if (event.type == sf::Event::Closed)
         window.close();
 
+      // Print screen
+      if (event.type == sf::Event::KeyPressed and event.key.code == sf::Keyboard::F12) {
+        // Create screenshots folder if not created yet
+        fs::path folderpath = binPath / "../screenshots/";
+        if (!fs::exists(folderpath) or !fs::is_directory(folderpath))
+          fs::create_directory(folderpath);
+
+        std::string filename = "codesketch";
+        // Choose the name of the sketch if running
+        if (sketchIsRunning())
+          filename = sketchPath.stem().string();
+        filename += "-";
+
+        // Find the first unused filename
+        int cnt = 0;
+        while (fs::exists(folderpath / (filename + std::to_string(cnt) + ".png")))
+          cnt++;
+
+        filename += std::to_string(cnt);
+        filename += ".png";
+
+        fs::path filepath = folderpath / filename;
+        if (window.capture().saveToFile(filepath.string()))
+          printf("Successfully saved screenshot: %s\n", filename.c_str());
+      }
+
       if (sketchIsRunning()) {
         if (event.type == sf::Event::KeyPressed and event.key.code == sf::Keyboard::Escape) {
           sketchClose();

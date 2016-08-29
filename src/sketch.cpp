@@ -27,9 +27,9 @@ sf::Color strokeColor = sf::Color::Black;
 float strokeThickness = 0.0f;
 
 // Subprocess
+fs::path sketchPath;
 pid_t sketchpid = 0;
 int sketchin[2], sketchout[2], sketcherr[2];
-int sketchStatus = 0;
 
 inline void sketchInit() {
   frameCount = 0;
@@ -41,6 +41,12 @@ inline void sketchInit() {
 }
 
 bool sketchOpen(const std::string& name) {
+  fs::path path { name };
+  if (!fs::exists(path))
+    return false;
+
+  sketchPath = path;
+
   // TODO(naum): treat errors
   if (pipe(sketchin) == -1) return false;
   if (pipe(sketchout) == -1) return false;
@@ -72,11 +78,6 @@ bool sketchOpen(const std::string& name) {
     close(sketchin[READ]);
     close(sketchout[WRITE]);
     close(sketcherr[WRITE]);
-
-    //fcntl(sketchout[READ], F_SETFL, fcntl(sketchout[READ], F_GETFL, 0) | O_NONBLOCK);
-    //fcntl(sketcherr[READ], F_SETFL, fcntl(sketcherr[READ], F_GETFL, 0) | O_NONBLOCK);
-
-    //fcntl(sketchout[READ], F_SETPIPE_SZ, 1048576);
   } else {
     // Error
 
@@ -103,10 +104,12 @@ void sketchClose() {
   close(sketchout[READ]);
   close(sketcherr[READ]);
   sketchpid = 0;
+
+  sketchPath.clear();
 }
 
 bool sketchIsRunning() {
-  sketchStatus = 0;
+  int sketchStatus = 0;
   if (sketchpid == 0 or waitpid(sketchpid, &sketchStatus, WNOHANG) != 0) {
     sketchpid = 0;
     return false;
