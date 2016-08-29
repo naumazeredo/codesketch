@@ -181,7 +181,7 @@ void textSize(int s);
 // Camera
 
 // Move top-left camera corner to (x, y). Starts at (0, 0)
-// (note: moving camera without sending drawing don't work as you would expect.
+// (note: moving camera without resending drawing doesn't work as you would expect.
 // This will probably be modified in the future.)
 void camera(int x, int y);
 
