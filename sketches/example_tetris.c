@@ -1,5 +1,8 @@
 #include "sketch.h"
 
+#include <time.h>
+#include <stdlib.h>
+
 enum {
   PIECE_NONE,
   PIECE_I, PIECE_J,
@@ -51,31 +54,80 @@ const int color[][3] = {
   {0xff, 0x00, 0x00}
 };
 
-const int BOARD_W = 10, BOARD_H = 20,
-          BOARD_PIECE_SIZE = 20;
+const int BOARD_W = 10, BOARD_H = 20, PIECE_SIZE = 20;
 
+int boardX, boardY;
 int board[BOARD_H][BOARD_W];
 
-void drawboard(int x, int y) {
-  for (int i = 0; i < BOARD_H; ++i) {
-    for (int j = 0; j < BOARD_W; ++j) {
-      int piece = board[i][j];
-      fill(color[piece][0], color[piece][1], color[piece][2]);
-      rect(x + i     * BOARD_PIECE_SIZE, y + j     * BOARD_PIECE_SIZE,
-           x + (i+1) * BOARD_PIECE_SIZE, y + (j+1) * BOARD_PIECE_SIZE);
+int piece, pieceX, pieceY, pieceR;
+
+int timer, difficulty;
+
+void drawSquare(int x, int y, int p) {
+  fill(color[p][0], color[p][1], color[p][2]);
+  rect(x, y, PIECE_SIZE, PIECE_SIZE);
+}
+
+void newPiece() {
+  piece = rand()%(PIECE_NUM-1)+1;
+  pieceX = 3;
+  pieceY = -2;
+  //pieceR = rand()%4;
+  pieceR = 0;
+}
+
+void drawPiece() {
+  for (int i = 0; i < 4; ++i) {
+    if (i + pieceY < 0) continue;
+
+    for (int j = 0; j < 4; ++j) {
+      char c;
+      if (pieceR == 0) c = pieces[piece][i][j];
+      if (pieceR == 1) c = pieces[piece][3-j][i];
+      if (pieceR == 2) c = pieces[piece][3-i][3-j];
+      if (pieceR == 3) c = pieces[piece][j][3-i];
+      if (c != ' ')
+        drawSquare(boardX + pieceX * PIECE_SIZE + j, boardY + pieceY * PIECE_SIZE + i, piece);
     }
   }
 }
 
-void setup() {
-  textSize(20);
+void drawBoard() {
+  for (int i = 0; i < BOARD_H; ++i)
+    for (int j = 0; j < BOARD_W; ++j)
+      drawSquare(boardX + j * PIECE_SIZE, boardY + i * PIECE_SIZE, board[i][j]);
+  drawPiece();
+}
 
-  for (int i = 0; i < BOARD_H; ++i) for (int j = 0; j < BOARD_W; ++j)
-    board[i][j] = (i * BOARD_W + j)%PIECE_NUM;
+void setup() {
+  // Random seed
+  srand(time(0));
+
+  // Timer
+  difficulty = 60; // number of draws until move
+  timer = difficulty;
+
+  // Board
+  boardX = (windowWidth - PIECE_SIZE * BOARD_W) / 2;
+  boardY = 20;
+
+  for (int i = 0; i < BOARD_H; ++i)
+    for (int j = 0; j < BOARD_W; ++j)
+      board[i][j] = PIECE_NONE;
+
+  // Piece
+  newPiece();
 }
 
 void draw() {
-  background(255, 0, 0);
-  drawboard(20, 20);
+  timer--;
+  if (timer < 0) {
+    // Try to move piece
+    pieceY++;
+    timer = difficulty;
+  }
+
+  background(127, 127, 127);
+  drawBoard();
 }
 
