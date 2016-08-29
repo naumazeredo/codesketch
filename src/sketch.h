@@ -81,6 +81,7 @@ const int keysSize = sizeof(keys)/sizeof(keys[0]);
 
 enum {
   COMMAND_FRAMEEND,
+  COMMAND_DEBUG,
 
   COMMAND_BACKGROUND,
 
