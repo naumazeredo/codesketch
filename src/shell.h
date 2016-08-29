@@ -15,7 +15,7 @@ namespace codesketch {
 
 // XXX(naum): remove const and do better?
 const int shellTextSize = 24,
-          shellLineH = shellTextSize,
+          shellLineH = shellTextSize - 4,
           shellX = 20,
           shellY = 48,
           shellW = windowWidth - 2 * shellX,

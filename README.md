@@ -32,6 +32,7 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [x] Simple code sketch and sketchbook sources
 - [x] Simple Makefile
 - [x] Implement text rendering
+  - [ ] Dynamic font loading (by sketches) (?)
 - [x] Create simple GUI in codesketch to list and run sketches
 - [x] Refactor code sketch for alfa version
 - [x] Implement drawing primitives
