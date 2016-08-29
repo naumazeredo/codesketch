@@ -5,19 +5,16 @@
 int r = 0, g = 0, b = 0;
 
 void setup() {
-  textSize(20);
+  textSize(24);
   fill(255, 255, 255);
 }
 
 void draw() {
   background(r, g, b);
-  text("Red:   press Q or A", 20, 20);
-  text("Green: press W or S", 20, 40);
-  text("Blue:  press E or D", 20, 60);
-
-  char buffer[256];
-  sprintf(buffer, "Color: #%02X%02X%02X", r, g, b);
-  text(buffer, 20, 80);
+  text(20, 20, "Red:   press Q or A");
+  text(20, 40, "Green: press W or S");
+  text(20, 60, "Blue:  press E or D");
+  text(20, 80, "Color: #%02X%02X%02X", r, g, b);
 
   if (keyDown(KEY_Q)) r++;
   if (keyDown(KEY_A)) r--;

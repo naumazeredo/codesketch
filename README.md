@@ -171,9 +171,9 @@ void strokeThickness(int t);
 
 // Text
 
-// Render text t with upper-left corner at (x, y)
+// Render text format (using extra variables, like printf) with upper-left corner at (x, y)
 // The text will have the fill color as it's color
-void text(const char* t, int x, int y);
+void text(int x, int y, const char* format, ...);
 
 // Change text size (s must be positive)
 void textSize(int s);
@@ -184,6 +184,11 @@ void textSize(int s);
 // (note: moving camera without resending drawing doesn't work as you would expect.
 // This will probably be modified in the future.)
 void camera(int x, int y);
+
+// Debug
+
+// Print debug format (using extra variables, like printf)
+void debug(const char* format, ...);
 
 // Exit
 
@@ -218,6 +223,8 @@ SFML: `sudo apt install libsfml-dev`
 
 Boost Filesystem: `sudo apt install libboost-filesystem-dev`
 
-## Known bugs
+## Known bugs/problems
 
 - May run suboptimally in case of large inputs.
+- Defines on _text_ and _debug_ may not be the best option.
+- Inserting ```\n``` on text and debug can cause issues. (!)
