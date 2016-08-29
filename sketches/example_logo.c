@@ -10,6 +10,7 @@ float k = 0.02f;
 // setup is executed only once at the beginning
 void setup() {
   strokeThickness(1);
+  textSize(24);
 }
 
 // draw is executed around 60 times per second
@@ -25,10 +26,13 @@ void draw() {
          i * windowWidth / NUM_LINES, windowHeight);
   }
 
+  text("Welcome to Code Sketch!", 20, 20);
+
   float s = (1 + sin(frameCount * k))/2;
   x = windowWidth * s;
   y = windowHeight * s;
 
   fill(255, 255, 255);
   circle(x, y, radius);
+
 }
