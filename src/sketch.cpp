@@ -50,7 +50,7 @@ bool sketchOpen(const std::string& name) {
   // TODO(naum): treat errors
   if (pipe(sketchin) == -1) return false;
   if (pipe(sketchout) == -1) return false;
-  if (pipe(sketcherr) == -1) return false;
+  /*if (pipe(sketcherr) == -1) return false;*/
 
   sketchpid = fork();
 
@@ -59,14 +59,16 @@ bool sketchOpen(const std::string& name) {
 
     if (dup2(sketchin[READ],   STDIN_FILENO)  == -1) return false;
     if (dup2(sketchout[WRITE], STDOUT_FILENO) == -1) return false;
-    if (dup2(sketcherr[WRITE], STDERR_FILENO) == -1) return false;
+    /*if (dup2(sketcherr[WRITE], STDERR_FILENO) == -1) return false;*/
 
     close(sketchin[READ]);
     close(sketchin[WRITE]);
     close(sketchout[READ]);
     close(sketchout[WRITE]);
+    /*
     close(sketcherr[READ]);
     close(sketcherr[WRITE]);
+    */
 
     if (execl(name.c_str(), name.c_str(), nullptr) == -1) {
       // Exec fail: kill child!
@@ -77,7 +79,7 @@ bool sketchOpen(const std::string& name) {
 
     close(sketchin[READ]);
     close(sketchout[WRITE]);
-    close(sketcherr[WRITE]);
+    /*close(sketcherr[WRITE]);*/
   } else {
     // Error
 
@@ -85,8 +87,10 @@ bool sketchOpen(const std::string& name) {
     close(sketchin[WRITE]);
     close(sketchout[READ]);
     close(sketchout[WRITE]);
+    /*
     close(sketcherr[READ]);
     close(sketcherr[WRITE]);
+    */
 
     return false;
   }
@@ -102,7 +106,7 @@ void sketchClose() {
   kill(sketchpid, SIGKILL);
   close(sketchin[WRITE]);
   close(sketchout[READ]);
-  close(sketcherr[READ]);
+  /*close(sketcherr[READ]);*/
   sketchpid = 0;
 
   sketchPath.clear();
@@ -139,6 +143,12 @@ inline void sketchReceiveData() {
 
     if (type == COMMAND_FRAMEEND)
       break;
+
+    if (type == COMMAND_DEBUG) {
+      std::string text;
+      getline(cmd, text);
+      printf("[sketch debug]: %s\n", text.c_str());
+    }
 
     if (type == COMMAND_BACKGROUND) {
       int r, g, b;

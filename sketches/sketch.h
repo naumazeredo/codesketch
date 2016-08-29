@@ -3,6 +3,7 @@
 
 enum {
   _COMMAND_FRAMEEND,
+  _COMMAND_DEBUG,
 
   _COMMAND_BACKGROUND,
 
@@ -225,6 +226,10 @@ void textSize(int s) {
 
 void camera(int x, int y) {
   printf("%d %d %d\n", _COMMAND_CAMERA, x, y);
+}
+
+void debug(const char* s) {
+  printf("%d %s\n", _COMMAND_DEBUG, s);
 }
 
 void exit() {
