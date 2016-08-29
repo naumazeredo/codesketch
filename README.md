@@ -56,15 +56,15 @@ shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/co
 - [ ] Shell
   - [x] Basic commands
   - [ ] Text wrapping
-  - [ ] Cursor
+  - [ ] Blinking cursor
+  - [ ] Caret (?)
   - [ ] Colors (?)
-  - [ ] Better font (?)
 - [ ] Window resizing (?)
 - [ ] Port to Windows
 - [ ] Add version and setup process (instead of sending same data to setup)
 - [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
   with large input)
-- [ ] Release binaries with exclusive README
+- [ ] Release binaries (with exclusive README)
 
 ## Learning with Code Sketch
 
@@ -197,6 +197,9 @@ Compile your code: `g++ mysketch.c -o mysketch.out` (on Linux)
 
 Run Code Sketch binary and type: `> run sketches/mysketch.out` (you can find
 your binary using `ls` and `cd` commands).
+
+(You can take screenshots by pressing F12. If you can't show your sketch
+running, at least take a picture :wink:)
 
 ### Be creative!
 
