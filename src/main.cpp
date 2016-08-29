@@ -41,7 +41,7 @@ void init(int argc, char** argv) {
 
 void run() {
   window.clear();
-  shellAddHistory("Type help for help!");
+  shellAddOutput("Type help for help!");
 
   while (window.isOpen()) {
     sf::Event event;
@@ -86,9 +86,13 @@ void run() {
           } else if (event.key.code == sf::Keyboard::Return) {
             shellParseInput();
           } else if (event.key.code == sf::Keyboard::L and event.key.control) {
-            shellClearHistory();
+            shellClearOutput();
           } else if (event.key.code == sf::Keyboard::D and event.key.control) {
             window.close();
+          } else if (event.key.code == sf::Keyboard::Up) {
+            shellMoveCursorUp();
+          } else if (event.key.code == sf::Keyboard::Down) {
+            shellMoveCursorDown();
           }
         } else if (event.type == sf::Event::TextEntered) {
           shellAddInput(event.text.unicode);
