@@ -14,6 +14,10 @@ enum {
 
 const char pieces[][4][5] = {
   { "    ",
+    "    ",
+    "    ",
+    "    " },
+  { "    ",
     "....",
     "    ",
     "    " },
@@ -74,6 +78,8 @@ void newPiece() {
   pieceY = -2;
   //pieceR = rand()%4;
   pieceR = 0;
+
+  debug("piece: %d\n", piece);
 }
 
 void drawPiece() {
@@ -87,7 +93,7 @@ void drawPiece() {
       if (pieceR == 2) c = pieces[piece][3-i][3-j];
       if (pieceR == 3) c = pieces[piece][j][3-i];
       if (c != ' ')
-        drawSquare(boardX + pieceX * PIECE_SIZE + j, boardY + pieceY * PIECE_SIZE + i, piece);
+        drawSquare(boardX + (pieceX + j) * PIECE_SIZE, boardY + (pieceY + i) * PIECE_SIZE, piece);
     }
   }
 }
