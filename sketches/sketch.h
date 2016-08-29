@@ -215,9 +215,7 @@ void strokeThickness(int thickness) {
   printf("%d %d\n", _COMMAND_STROKETHICKNESS, thickness);
 }
 
-void text(const char* t, int x, int y) {
-  printf("%d %d %d %s\n", _COMMAND_TEXT, x, y, t);
-}
+#define text(x, y, format, ...) printf("%d %d %d " format "\n", _COMMAND_TEXT, (x), (y), ##__VA_ARGS__)
 
 void textSize(int s) {
   if (s < 0) s = 0;
@@ -228,9 +226,7 @@ void camera(int x, int y) {
   printf("%d %d %d\n", _COMMAND_CAMERA, x, y);
 }
 
-void debug(const char* s) {
-  printf("%d %s\n", _COMMAND_DEBUG, s);
-}
+#define debug(format, ...) printf("%d " format "\n", _COMMAND_DEBUG, ##__VA_ARGS__)
 
 void exit() {
   _running_ = 0;
