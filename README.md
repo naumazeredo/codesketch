@@ -27,6 +27,15 @@ but why not the majority of them?
 Using the [Processing](https://processing.org) idea, as a flexible software
 sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 
+## Screenshots
+
+![Code Sketch
+shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/codesketch.png)
+
+![Shell help]( https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/help.png)
+
+![Example](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/codesketch.png)
+
 ## TODO
 
 - [x] Simple code sketch and sketchbook sources
