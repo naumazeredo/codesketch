@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-enum { DIR_U, DIR_D, DIR_L, DIR_R };
+enum { DIR_X, DIR_U, DIR_D, DIR_L, DIR_R, DIR_NUM };
 
 enum {
   PIECE_NONE, PIECE_I, PIECE_J, PIECE_L, PIECE_O, PIECE_S, PIECE_T, PIECE_Z,
@@ -20,6 +20,8 @@ const char pieces[][4][5] = {
   { "    ", "... ", " .  ", "    " },
   { "    ", "..  ", " .. ", "    " }
 };
+
+const int pieceTotalRot[] = { 1, 2, 4, 4, 1, 2, 4, 2, 1 };
 
 const int colors[][3] = {
   {0x00, 0x00, 0x00},
@@ -48,10 +50,12 @@ void drawSquare(int x, int y, int p) {
 }
 
 void createPiece() {
-  piece = rand()%(PIECE_NUM-1)+1;
+  //piece = rand()%(PIECE_NUM-1)+1;
+  piece = 1;
   pieceX = 3;
   pieceY = 0;
-  pieceR = rand()%4;
+
+  pieceR = rand()%pieceTotalRot[piece];
 }
 
 void movePiece(int dir) {
@@ -63,6 +67,7 @@ void movePiece(int dir) {
 
 int canMovePiece(int dir) {
   int nX = pieceX, nY = pieceY;
+  if (dir == DIR_U) nY--;
   if (dir == DIR_D) nY++;
   if (dir == DIR_R) nX++;
   if (dir == DIR_L) nX--;
@@ -86,23 +91,40 @@ int canMovePiece(int dir) {
 }
 
 int checkGameOver() {
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      char c;
-      if (pieceR == 0) c = pieces[piece][i][j];
-      if (pieceR == 1) c = pieces[piece][3-j][i];
-      if (pieceR == 2) c = pieces[piece][3-i][3-j];
-      if (pieceR == 3) c = pieces[piece][j][3-i];
-      if (c != ' ' and board[pieceY+i][pieceX+j])
-        return 1;
-    }
-  }
-  return 0;
+  return !canMovePiece(DIR_X);
 }
 
 void dunkPiece() {
   while (canMovePiece(DIR_D)) movePiece(DIR_D);
   timer = 0;
+}
+
+int rotatePiece() {
+  if (pieceTotalRot[piece] == 1) return 1;
+
+  int rot = pieceR;
+
+  // Try to rotate
+  pieceR = (rot + 1)%pieceTotalRot[piece];
+  for (int i = DIR_X; i < DIR_NUM; ++i) if (canMovePiece(i)) {
+    movePiece(i);
+    return 1;
+  }
+
+  // If piece is I we have some problems with rotations
+  // so we treat them apart
+  if (piece == PIECE_I) {
+    movePiece(DIR_R);
+    if (canMovePiece(DIR_R)) {
+      movePiece(DIR_R);
+      return 1;
+    }
+    movePiece(DIR_L);
+  }
+
+  pieceR = rot;
+
+  return 0;
 }
 
 void drawPiece(int x, int y) {
@@ -167,7 +189,7 @@ int keyPressed(int key) {
 }
 
 void updateKeys() {
-  static int keylist[] = { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP, KEY_SPACE };
+  static int keylist[] = { KEY_UP, KEY_SPACE };
   for (int i = 0; i < sizeof(keylist)/sizeof(keylist[0]); ++i)
     keys[keylist[i]] = keyDown(keylist[i]);
 }
@@ -203,6 +225,7 @@ void draw() {
   if (keyDown(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
   if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D);
   if (keyPressed(KEY_SPACE)) dunkPiece();
+  if (keyPressed(KEY_UP))    rotatePiece();
 
   updateKeys();
 
