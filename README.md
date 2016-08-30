@@ -70,9 +70,9 @@ shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/co
 
 ### Install dependencies
 
-SFML: `$ sudo apt-get install libsfml-system2.3v5 libsfml-graphics2.3v5 libsfml-window2.3v5`
+SFML: `$ sudo apt-get install libsfml-dev`
 
-Boost Filesystem: `$ sudo apt-get install libboost-filesystem1.58`
+Boost Filesystem (should already be installed on Ubuntu 14.04 or later): `$ sudo apt-get install libboost-dev`
 
 ### Begin to code
 
@@ -231,9 +231,15 @@ Happy coding!
 
 ### Dependencies
 
-SFML: `sudo apt install libsfml-dev`
+#### Ubuntu 14.04 or later
 
-Boost Filesystem: `sudo apt install libboost-filesystem-dev`
+Be sure your system is up-to-date: `sudo apt-get dist-upgrade`
+
+G++: `sudo apt-get install g++ binutils`
+
+SFML: `sudo apt-get install libsfml-dev`
+
+Boost Filesystem: `sudo apt-get install libboost-filesystem-dev`
 
 ## Known bugs/problems
 
