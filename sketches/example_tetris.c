@@ -50,8 +50,7 @@ void drawSquare(int x, int y, int p) {
 }
 
 void createPiece() {
-  //piece = rand()%(PIECE_NUM-1)+1;
-  piece = 1;
+  piece = rand()%(PIECE_NUM-1)+1;
   pieceX = 3;
   pieceY = 0;
 
@@ -143,6 +142,25 @@ void drawPiece(int x, int y) {
   }
 }
 
+void removeLine(int x) {
+  for (int i = x; i > 0; --i)
+    for (int j = 0; j < BOARD_W; ++j)
+      board[i][j] = board[i-1][j];
+
+  for (int j = 0; j < BOARD_W; ++j)
+    board[0][j] = 0;
+}
+
+void removeCompleteLines() {
+  for (int i = BOARD_TOP_H; i < BOARD_H; ++i) {
+    int tot = 0;
+    for (int j = 0; j < BOARD_W; ++j)
+      tot += !!board[i][j];
+    if (tot == BOARD_W)
+      removeLine(i);
+  }
+}
+
 void addPieceToBoard() {
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
@@ -170,7 +188,7 @@ void drawBoard() {
 void startGame() {
   // Timer
   difficulty = 20; // number of draws until move
-  timer = difficulty;
+  timer = 0;
 
   // Board
   boardX = (windowWidth - PIECE_SIZE * BOARD_W) / 2;
@@ -180,8 +198,29 @@ void startGame() {
     for (int j = 0; j < BOARD_W; ++j)
       board[i][j] = PIECE_NONE;
 
-  // Piece
-  createPiece();
+  piece = 0;
+}
+
+void resetTimer() {
+  timer = difficulty;
+}
+
+void triggerTimer() {
+  // Try to move piece
+  if (piece and canMovePiece(DIR_D)) {
+    movePiece(DIR_D);
+  } else {
+    addPieceToBoard();
+    removeCompleteLines();
+
+    createPiece();
+
+    if (checkGameOver()) {
+      startGame();
+    }
+  }
+
+  resetTimer();
 }
 
 int keyPressed(int key) {
@@ -204,28 +243,17 @@ void setup() {
 }
 
 void draw() {
-  timer--;
-  if (timer < 0) {
-    // Try to move piece
-    if (canMovePiece(DIR_D)) {
-      movePiece(DIR_D);
-    } else {
-      addPieceToBoard();
-      createPiece();
-      if (checkGameOver()) {
-        startGame();
-      }
-    }
-    timer = difficulty;
-  }
-
-  background(127, 127, 127);
-
   if (keyDown(KEY_LEFT)  and canMovePiece(DIR_L)) movePiece(DIR_L);
   if (keyDown(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
-  if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D);
-  if (keyPressed(KEY_SPACE)) dunkPiece();
+  if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D), resetTimer();
+  if (keyPressed(KEY_SPACE)) dunkPiece(), triggerTimer();
   if (keyPressed(KEY_UP))    rotatePiece();
+
+  timer--;
+  if (timer < 0)
+    triggerTimer();
+
+  background(127, 127, 127);
 
   updateKeys();
 
