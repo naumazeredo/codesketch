@@ -10,7 +10,12 @@ namespace codesketch {
 sf::ContextSettings settings;
 sf::RenderWindow window;
 
-int windowWidth = 640, windowHeight = 480;
+const int defaultWindowWidth     = 640,
+          defaultWindowHeight    = 480,
+          defaultWindowFramerate = 60;
+int windowWidth     = defaultWindowWidth,
+    windowHeight    = defaultWindowHeight,
+    windowFramerate = defaultWindowFramerate;
 
 int mouseX, mouseY;
 u8 mouseState;
@@ -33,7 +38,7 @@ void init(int argc, char** argv) {
     settings
   );
 
-  window.setFramerateLimit(60);
+  window.setFramerateLimit(defaultWindowFramerate);
 
   // Initialize text
   textInit();

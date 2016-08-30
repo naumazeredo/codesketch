@@ -25,11 +25,16 @@ namespace codesketch {
 // Sketch variables
 SketchState sketchState;
 std::vector<SketchState> sketchStateStash;
+int sketchSetup;
 
 // Subprocess
 fs::path sketchPath;
 pid_t sketchpid = 0;
 int sketchin[2], sketchout[2], sketcherr[2];
+
+inline void sketchSendData();
+inline void sketchReceiveData();
+
 
 inline void sketchInit() {
   frameCount = 0;
@@ -100,7 +105,21 @@ bool sketchOpen(const std::string& name) {
 
   sketchInit();
 
+  sketchSetup = 1;
+  sketchSendData();
+  sketchReceiveData();
+  sketchSetup = 0;
+
   return sketchIsRunning();
+}
+
+inline void restoreDefaults() {
+  //if (windowWidth != defaultWindowWidth or windowHeight != defaultWindowHeight)
+
+  if (windowFramerate != defaultWindowFramerate) {
+    windowFramerate = defaultWindowFramerate;
+    window.setFramerateLimit(windowFramerate);
+  }
 }
 
 void sketchClose() {
@@ -113,6 +132,8 @@ void sketchClose() {
   sketchpid = 0;
 
   sketchPath.clear();
+
+  restoreDefaults();
 }
 
 bool sketchIsRunning() {
@@ -143,6 +164,19 @@ inline void sketchReceiveData() {
     std::istringstream cmd(data);
     int type;
     cmd >> type;
+
+    // Setup commands
+    if (type == COMMAND_FRAMERATE) {
+      if (!sketchSetup) {
+        printf("[sketch warning] Calling framerate from outside setup!\n");
+        continue;
+      }
+
+      int r;
+      cmd >> r;
+      windowFramerate = r;
+      window.setFramerateLimit(windowFramerate);
+    }
 
     if (type == COMMAND_FRAMEEND) {
       // Verify incorrect frame ends

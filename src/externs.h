@@ -24,8 +24,8 @@ namespace codesketch {
 // Main
 extern sf::RenderWindow window;
 
-extern int windowWidth;
-extern int windowHeight;
+extern const int defaultWindowWidth, defaultWindowHeight, defaultWindowFramerate;
+extern int windowWidth, windowHeight, windowFramerate;
 extern bool isRunning;
 
 extern int mouseX;

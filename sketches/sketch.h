@@ -25,6 +25,8 @@ enum {
   _COMMAND_PUSH,
   _COMMAND_POP,
 
+  _COMMAND_FRAMERATE,
+
   // XXX(naum): Not implemented
   _COMMAND_ELLIPSE,
   _COMMAND_WINDOW,
@@ -235,6 +237,11 @@ void push() {
 
 void pop() {
   printf("%d\n", _COMMAND_POP);
+}
+
+void framerate(int r) {
+  if (r <= 0) r = 1;
+  printf("%d %d\n", _COMMAND_FRAMERATE, r);
 }
 
 void exit() {

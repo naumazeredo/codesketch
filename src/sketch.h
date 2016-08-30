@@ -103,6 +103,8 @@ enum {
   COMMAND_PUSH,
   COMMAND_POP,
 
+  COMMAND_FRAMERATE,
+
   // XXX(naum): Not implemented
   COMMAND_ELLIPSE,
 
