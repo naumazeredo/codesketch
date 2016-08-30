@@ -27,6 +27,11 @@ SketchState sketchState;
 std::vector<SketchState> sketchStateStash;
 int sketchSetup;
 
+int mouseX, mouseY;
+u8 mouseState;
+
+int frameCount;
+
 // Subprocess
 fs::path sketchPath;
 pid_t sketchpid = 0;
@@ -65,7 +70,7 @@ bool sketchOpen(const std::string& name) {
   // TODO(naum): treat errors
   if (pipe(sketchin) == -1) return false;
   if (pipe(sketchout) == -1) return false;
-  /*if (pipe(sketcherr) == -1) return false;*/
+  if (pipe(sketcherr) == -1) return false;
 
   sketchpid = fork();
 
@@ -74,16 +79,14 @@ bool sketchOpen(const std::string& name) {
 
     if (dup2(sketchin[READ],   STDIN_FILENO)  == -1) return false;
     if (dup2(sketchout[WRITE], STDOUT_FILENO) == -1) return false;
-    /*if (dup2(sketcherr[WRITE], STDERR_FILENO) == -1) return false;*/
+    if (dup2(sketcherr[WRITE], STDERR_FILENO) == -1) return false;
 
     close(sketchin[READ]);
     close(sketchin[WRITE]);
     close(sketchout[READ]);
     close(sketchout[WRITE]);
-    /*
     close(sketcherr[READ]);
     close(sketcherr[WRITE]);
-    */
 
     if (execl(name.c_str(), name.c_str(), nullptr) == -1) {
       // Exec fail: kill child!
@@ -94,7 +97,10 @@ bool sketchOpen(const std::string& name) {
 
     close(sketchin[READ]);
     close(sketchout[WRITE]);
-    /*close(sketcherr[WRITE]);*/
+    close(sketcherr[WRITE]);
+
+    // Non-blocking stderr
+    fcntl(sketcherr[READ], F_SETFL, fcntl(sketcherr[READ], F_GETFL, 0) | O_NONBLOCK);
   } else {
     // Error
 
@@ -102,10 +108,8 @@ bool sketchOpen(const std::string& name) {
     close(sketchin[WRITE]);
     close(sketchout[READ]);
     close(sketchout[WRITE]);
-    /*
     close(sketcherr[READ]);
     close(sketcherr[WRITE]);
-    */
 
     return false;
   }
@@ -118,6 +122,25 @@ bool sketchOpen(const std::string& name) {
   sketchSetup = 0;
 
   return sketchIsRunning();
+}
+
+inline void sketchReadErrors() {
+  std::string data;
+
+  while (1) {
+    data = "";
+
+    char c;
+    int bytesread;
+    while ((bytesread = read(sketcherr[READ], &c, 1)) > 0 and c != '\n')
+      data += c;
+
+    if (data.length() > 0)
+      printf("[sketch stderr] %s\n", data.c_str());
+
+    if (bytesread <= 0)
+      break;
+  }
 }
 
 inline void restoreDefaults() {
@@ -133,10 +156,14 @@ inline void restoreDefaults() {
 void sketchClose() {
   if (!sketchIsRunning()) return;
 
+  // Try to read errors before closing
+  // XXX(naum): Not working...
+  /*sketchReadErrors();*/
+
   kill(sketchpid, SIGKILL);
   close(sketchin[WRITE]);
   close(sketchout[READ]);
-  /*close(sketcherr[READ]);*/
+  close(sketcherr[READ]);
   sketchpid = 0;
 
   sketchPath.clear();
@@ -401,12 +428,31 @@ inline void sketchReceiveData() {
       }
     }
   }
+
+  sketchReadErrors();
 }
 
 inline void sketchSendData() {
+  // Keyboard
   char keysstr[keysSize+1] = {};
-  for (unsigned i = 0; i < keysSize; ++i)
-    keysstr[i] = '0'+sf::Keyboard::isKeyPressed(keys[i]);
+  if (window.hasFocus()) {
+    for (unsigned i = 0; i < keysSize; ++i)
+      keysstr[i] = '0'+sf::Keyboard::isKeyPressed(keys[i]);
+  } else {
+    for (unsigned i = 0; i < keysSize; ++i)
+      keysstr[i] = '0';
+  }
+
+  // Mouse
+  auto mouse = sf::Mouse::getPosition(window);
+  mouseX = mouse.x;
+  mouseY = mouse.y;
+  mouseState = 0;
+  if (window.hasFocus()) {
+    for (int i = sf::Mouse::Left; i < sf::Mouse::ButtonCount; ++i)
+      if (sf::Mouse::isButtonPressed(sf::Mouse::Button(i)))
+        mouseState |= (1<<i);
+  }
 
   char data[1024];
   sprintf(data, "%d %d %d %d %d %d %s\n",

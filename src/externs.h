@@ -32,12 +32,6 @@ extern const int defaultWindowWidth, defaultWindowHeight, defaultWindowFramerate
 extern int windowWidth, windowHeight, windowFramerate;
 extern bool isRunning;
 
-extern int mouseX;
-extern int mouseY;
-extern u8 mouseState;
-
-extern int frameCount;
-
 extern fs::path binPath;
 
 // Text

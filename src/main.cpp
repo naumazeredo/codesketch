@@ -20,11 +20,6 @@ int windowWidth     = defaultWindowWidth,
     windowHeight    = defaultWindowHeight,
     windowFramerate = defaultWindowFramerate;
 
-int mouseX, mouseY;
-u8 mouseState;
-
-int frameCount;
-
 fs::path binPath;
 
 void init(int argc, char** argv) {
@@ -40,6 +35,31 @@ void init(int argc, char** argv) {
   textInit();
 }
 
+void printScreen() {
+  // Create screenshots folder if not created yet
+  fs::path folderpath = binPath / "../screenshots/";
+  if (!fs::exists(folderpath) or !fs::is_directory(folderpath))
+    fs::create_directory(folderpath);
+
+  std::string filename = "codesketch";
+  // Choose the name of the sketch if running
+  if (sketchIsRunning())
+    filename = sketchPath.stem().string();
+  filename += "-";
+
+  // Find the first unused filename
+  int cnt = 0;
+  while (fs::exists(folderpath / (filename + std::to_string(cnt) + ".png")))
+    cnt++;
+
+  filename += std::to_string(cnt);
+  filename += ".png";
+
+  fs::path filepath = folderpath / filename;
+  if (window.capture().saveToFile(filepath.string()))
+    printf("Successfully saved screenshot: %s\n", filename.c_str());
+}
+
 void run() {
   window.clear();
   shellAddOutput("Type help for help!");
@@ -52,28 +72,7 @@ void run() {
 
       // Print screen
       if (event.type == sf::Event::KeyPressed and event.key.code == sf::Keyboard::F12) {
-        // Create screenshots folder if not created yet
-        fs::path folderpath = binPath / "../screenshots/";
-        if (!fs::exists(folderpath) or !fs::is_directory(folderpath))
-          fs::create_directory(folderpath);
-
-        std::string filename = "codesketch";
-        // Choose the name of the sketch if running
-        if (sketchIsRunning())
-          filename = sketchPath.stem().string();
-        filename += "-";
-
-        // Find the first unused filename
-        int cnt = 0;
-        while (fs::exists(folderpath / (filename + std::to_string(cnt) + ".png")))
-          cnt++;
-
-        filename += std::to_string(cnt);
-        filename += ".png";
-
-        fs::path filepath = folderpath / filename;
-        if (window.capture().saveToFile(filepath.string()))
-          printf("Successfully saved screenshot: %s\n", filename.c_str());
+        printScreen();
       }
 
       if (sketchIsRunning()) {
@@ -100,15 +99,6 @@ void run() {
         }
       }
     }
-
-    // Mouse
-    auto mouse = sf::Mouse::getPosition(window);
-    mouseX = mouse.x;
-    mouseY = mouse.y;
-    mouseState = 0;
-    for (int i = sf::Mouse::Left; i < sf::Mouse::ButtonCount; ++i)
-      if (sf::Mouse::isButtonPressed(sf::Mouse::Button(i)))
-        mouseState |= (1<<i);
 
     if (sketchIsRunning()) {
       // If sketch is running, I/O the sketch
