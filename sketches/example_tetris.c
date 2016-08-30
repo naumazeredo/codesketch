@@ -3,6 +3,21 @@
 #include <time.h>
 #include <stdlib.h>
 
+#define PIECE_ITER_BEGIN(piece)                             \
+  for (int i = 0; i < 4; ++i) {                             \
+    for (int j = 0; j < 4; ++j) {                           \
+      char c;                                               \
+      if (piece.rot == 0) c = pieces[piece.type][i][j];     \
+      if (piece.rot == 1) c = pieces[piece.type][3-j][i];   \
+      if (piece.rot == 2) c = pieces[piece.type][3-i][3-j]; \
+      if (piece.rot == 3) c = pieces[piece.type][j][3-i];   \
+      if (c != ' ') {                                       \
+
+#define PIECE_ITER_END() \
+      }                  \
+    }                    \
+  }
+
 enum { DIR_X, DIR_U, DIR_D, DIR_L, DIR_R, DIR_NUM };
 
 enum {
@@ -39,8 +54,11 @@ const int BOARD_W = 10, BOARD_H = 23, BOARD_TOP_H = 3, PIECE_SIZE = 20;
 int boardX, boardY;
 int board[BOARD_H][BOARD_W];
 
-int piece, pieceX, pieceY, pieceR;
-int next, nextR, nextX, nextY;
+struct Piece {
+  int type, x, y, rot;
+} piece, next, hold;
+
+int holdCnt;
 
 int timer, difficulty;
 int keys[KEY_NUM];
@@ -50,50 +68,68 @@ void drawSquare(int x, int y, int p) {
   rect(x, y, PIECE_SIZE, PIECE_SIZE);
 }
 
+void holdPiece() {
+  if (holdCnt <= 0) return;
+
+  if (!hold.type) {
+    hold.type  = piece.type;
+    hold.rot   = piece.rot;
+    piece.type = 0;
+  } else {
+    Piece tmp;
+    tmp.type   = hold.type;
+    tmp.rot    = hold.rot;
+
+    hold.type  = piece.type;
+    hold.rot   = piece.rot;
+
+    piece.type = tmp.type;
+    piece.rot  = tmp.rot;
+  }
+
+  holdCnt--;
+}
+
 void createNext() {
-  next = rand()%(PIECE_NUM-1)+1;
-  nextR = rand()%pieceTotalRot[piece];
+  next.type = rand()%(PIECE_NUM-1)+1;
+  next.rot = rand()%pieceTotalRot[piece.type];
 }
 
 void createPiece() {
-  if (!next)
+  if (!next.type)
     createNext();
 
-  piece = next;
-  pieceX = 3;
-  pieceY = 0;
+  piece.type = next.type;
+  piece.rot = next.rot;
+  piece.x = 3;
+  piece.y = 0;
 
   createNext();
+
+  // Reset hold
+  holdCnt = 1;
 }
 
 void movePiece(int dir) {
-  if (dir == DIR_U) pieceY--;
-  if (dir == DIR_D) pieceY++;
-  if (dir == DIR_R) pieceX++;
-  if (dir == DIR_L) pieceX--;
+  if (dir == DIR_U) piece.y--;
+  if (dir == DIR_D) piece.y++;
+  if (dir == DIR_R) piece.x++;
+  if (dir == DIR_L) piece.x--;
 }
 
 int canMovePiece(int dir) {
-  int nX = pieceX, nY = pieceY;
-  if (dir == DIR_U) nY--;
-  if (dir == DIR_D) nY++;
-  if (dir == DIR_R) nX++;
-  if (dir == DIR_L) nX--;
+  int nx = piece.x, ny = piece.y;
+  if (dir == DIR_U) ny--;
+  if (dir == DIR_D) ny++;
+  if (dir == DIR_R) nx++;
+  if (dir == DIR_L) nx--;
 
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      char c;
-      if (pieceR == 0) c = pieces[piece][i][j];
-      if (pieceR == 1) c = pieces[piece][3-j][i];
-      if (pieceR == 2) c = pieces[piece][3-i][3-j];
-      if (pieceR == 3) c = pieces[piece][j][3-i];
-      if (c != ' ') {
-        int x = nX + j, y = nY + i;
-        if (x < 0 or x >= BOARD_W or y >= BOARD_H or y < 0 or board[y][x])
-          return 0;
-      }
+  PIECE_ITER_BEGIN(piece)
+    int x = nx + j, y = ny + i;
+    if (x < 0 or x >= BOARD_W or y >= BOARD_H or y < 0 or board[y][x]) {
+      return 0;
     }
-  }
+  PIECE_ITER_END()
 
   return 1;
 }
@@ -108,12 +144,12 @@ void dunkPiece() {
 }
 
 int rotatePiece() {
-  if (pieceTotalRot[piece] == 1) return 1;
+  if (pieceTotalRot[piece.type] == 1) return 1;
 
-  int rot = pieceR;
+  int rot = piece.rot;
 
   // Try to rotate
-  pieceR = (rot + 1)%pieceTotalRot[piece];
+  piece.rot = (rot + 1)%pieceTotalRot[piece.type];
   for (int i = DIR_X; i < DIR_NUM; ++i) if (canMovePiece(i)) {
     movePiece(i);
     return 1;
@@ -121,7 +157,7 @@ int rotatePiece() {
 
   // If piece is I we have some problems with rotations
   // so we treat them apart
-  if (piece == PIECE_I) {
+  if (piece.type == PIECE_I) {
     movePiece(DIR_R);
     if (canMovePiece(DIR_R)) {
       movePiece(DIR_R);
@@ -130,25 +166,16 @@ int rotatePiece() {
     movePiece(DIR_L);
   }
 
-  pieceR = rot;
+  piece.rot = rot;
 
   return 0;
 }
 
 void drawPiece(int x, int y) {
-  for (int i = 0; i < 4; ++i) {
-    if (i + pieceY < BOARD_TOP_H) continue;
-
-    for (int j = 0; j < 4; ++j) {
-      char c;
-      if (pieceR == 0) c = pieces[piece][i][j];
-      if (pieceR == 1) c = pieces[piece][3-j][i];
-      if (pieceR == 2) c = pieces[piece][3-i][3-j];
-      if (pieceR == 3) c = pieces[piece][j][3-i];
-      if (c != ' ')
-        drawSquare(x + (pieceX + j) * PIECE_SIZE, y + (pieceY + i) * PIECE_SIZE, piece);
-    }
-  }
+  PIECE_ITER_BEGIN(piece)
+    if (i + piece.y < BOARD_TOP_H) continue;
+    drawSquare(x + (piece.x + j) * PIECE_SIZE, y + (piece.y + i) * PIECE_SIZE, piece.type);
+  PIECE_ITER_END();
 }
 
 void removeLine(int x) {
@@ -171,37 +198,41 @@ void removeCompleteLines() {
 }
 
 void addPieceToBoard() {
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      char c;
-      if (pieceR == 0) c = pieces[piece][i][j];
-      if (pieceR == 1) c = pieces[piece][3-j][i];
-      if (pieceR == 2) c = pieces[piece][3-i][3-j];
-      if (pieceR == 3) c = pieces[piece][j][3-i];
-      if (c != ' ') {
-        int x = pieceX + j, y = pieceY + i;
-        if (x >= 0 and x < BOARD_W and y >= 0 and y < BOARD_H)
-          board[y][x] = piece;
-      }
-    }
-  }
+  PIECE_ITER_BEGIN(piece)
+    int x = piece.x + j, y = piece.y + i;
+    if (x >= 0 and x < BOARD_W and y >= 0 and y < BOARD_H)
+      board[y][x] = piece.type;
+  PIECE_ITER_END();
 }
 
 void drawNext() {
   fill(0, 0, 0);
-  rect(nextX, nextY, 6 * PIECE_SIZE, 6 * PIECE_SIZE);
+  rect(next.x, next.y, 6 * PIECE_SIZE, 6 * PIECE_SIZE);
 
-  for (int i = 0; i < 4; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      char c;
-      if (nextR == 0) c = pieces[next][i][j];
-      if (nextR == 1) c = pieces[next][3-j][i];
-      if (nextR == 2) c = pieces[next][3-i][3-j];
-      if (nextR == 3) c = pieces[next][j][3-i];
-      if (c != ' ')
-        drawSquare(nextX + (j+1) * PIECE_SIZE, nextY + (i+1) * PIECE_SIZE, next);
-    }
-  }
+  fill(255, 255, 255);
+  text(next.x +     PIECE_SIZE - 8, next.y - 8, "N");
+  text(next.x + 2 * PIECE_SIZE - 8, next.y - 8, "E");
+  text(next.x + 3 * PIECE_SIZE - 8, next.y - 8, "X");
+  text(next.x + 4 * PIECE_SIZE - 8, next.y - 8, "T");
+
+  PIECE_ITER_BEGIN(next)
+    drawSquare(next.x + (j+1) * PIECE_SIZE, next.y + (i+1) * PIECE_SIZE, next.type);
+  PIECE_ITER_END()
+}
+
+void drawHold() {
+  fill(0, 0, 0);
+  rect(hold.x, hold.y, 6 * PIECE_SIZE, 6 * PIECE_SIZE);
+
+  fill(255, 255, 255);
+  text(hold.x +     PIECE_SIZE - 8, hold.y - 8, "H");
+  text(hold.x + 2 * PIECE_SIZE - 8, hold.y - 8, "O");
+  text(hold.x + 3 * PIECE_SIZE - 8, hold.y - 8, "L");
+  text(hold.x + 4 * PIECE_SIZE - 8, hold.y - 8, "D");
+
+  PIECE_ITER_BEGIN(hold)
+    drawSquare(hold.x + (j+1) * PIECE_SIZE, hold.y + (i+1) * PIECE_SIZE, hold.type);
+  PIECE_ITER_END()
 }
 
 void drawBoard() {
@@ -225,11 +256,15 @@ void startGame() {
       board[i][j] = PIECE_NONE;
 
   // Piece
-  piece = 0;
+  piece.type = 0;
 
   // Next
-  nextX = boardX + (BOARD_W + 1) * PIECE_SIZE;
-  nextY = boardY + 5 * PIECE_SIZE;
+  next.x = boardX + (BOARD_W + 1) * PIECE_SIZE;
+  next.y = boardY + PIECE_SIZE;
+
+  // Hold
+  hold.x = boardX - 7 * PIECE_SIZE;
+  hold.y = boardY + PIECE_SIZE;
 }
 
 void resetTimer() {
@@ -238,7 +273,8 @@ void resetTimer() {
 
 void triggerTimer() {
   // Try to move piece
-  if (piece and canMovePiece(DIR_D)) {
+  debug("timer pieces: %d %d", piece.type, next.type);
+  if (piece.type and canMovePiece(DIR_D)) {
     movePiece(DIR_D);
   } else {
     addPieceToBoard();
@@ -259,13 +295,14 @@ int keyPressed(int key) {
 }
 
 void updateKeys() {
-  static int keylist[] = { KEY_UP, KEY_SPACE };
+  static int keylist[] = { KEY_UP, KEY_SPACE, KEY_C };
   for (int i = 0; i < sizeof(keylist)/sizeof(keylist[0]); ++i)
     keys[keylist[i]] = keyDown(keylist[i]);
 }
 
 void setup() {
   framerate(20);
+  textSize(24);
 
   // Random seed
   srand(time(0));
@@ -279,6 +316,7 @@ void draw() {
   if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D), resetTimer();
   if (keyPressed(KEY_SPACE)) dunkPiece(), triggerTimer();
   if (keyPressed(KEY_UP))    rotatePiece();
+  if (keyPressed(KEY_C))     holdPiece();
 
   timer--;
   if (timer < 0)
@@ -290,5 +328,6 @@ void draw() {
 
   drawBoard();
   drawNext();
+  drawHold();
 }
 
