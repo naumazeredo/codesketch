@@ -22,6 +22,9 @@ enum {
 
   _COMMAND_CAMERA,
 
+  _COMMAND_PUSH,
+  _COMMAND_POP,
+
   // XXX(naum): Not implemented
   _COMMAND_ELLIPSE,
   _COMMAND_WINDOW,
@@ -226,8 +229,17 @@ void camera(int x, int y) {
   printf("%d %d %d\n", _COMMAND_CAMERA, x, y);
 }
 
-#define debug(format, ...) printf("%d " format "\n", _COMMAND_DEBUG, ##__VA_ARGS__)
+void push() {
+  printf("%d\n", _COMMAND_PUSH);
+}
+
+void pop() {
+  printf("%d\n", _COMMAND_POP);
+}
 
 void exit() {
   _running_ = 0;
 }
+
+#define debug(format, ...) printf("%d " format "\n", _COMMAND_DEBUG, ##__VA_ARGS__)
+

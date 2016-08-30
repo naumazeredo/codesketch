@@ -100,6 +100,9 @@ enum {
 
   COMMAND_CAMERA,
 
+  COMMAND_PUSH,
+  COMMAND_POP,
+
   // XXX(naum): Not implemented
   COMMAND_ELLIPSE,
 

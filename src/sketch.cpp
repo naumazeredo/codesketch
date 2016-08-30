@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <vector>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -22,9 +23,8 @@
 namespace codesketch {
 
 // Sketch variables
-sf::Color fillColor = sf::Color::Black;
-sf::Color strokeColor = sf::Color::Black;
-float strokeThickness = 0.0f;
+SketchState sketchState;
+std::vector<SketchState> sketchStateStash;
 
 // Subprocess
 fs::path sketchPath;
@@ -33,9 +33,12 @@ int sketchin[2], sketchout[2], sketcherr[2];
 
 inline void sketchInit() {
   frameCount = 0;
-  fillColor = sf::Color::Black;
-  strokeColor = sf::Color::Black;
-  strokeThickness = 0.0f;
+
+  sketchState.fillColor = sf::Color::Black;
+  sketchState.strokeColor = sf::Color::Black;
+  sketchState.strokeThickness = 0.0f;
+
+  sketchStateStash.clear();
 
   window.clear();
 }
@@ -141,8 +144,13 @@ inline void sketchReceiveData() {
     int type;
     cmd >> type;
 
-    if (type == COMMAND_FRAMEEND)
+    if (type == COMMAND_FRAMEEND) {
+      // Verify incorrect frame ends
+      // Push and pop imbalance
+      if (sketchStateStash.size() > 0)
+        printf("[sketch warning] Push/pop imbalance. For each push must exist a pop!\n");
       break;
+    }
 
     if (type == COMMAND_DEBUG) {
       std::string text;
@@ -161,9 +169,9 @@ inline void sketchReceiveData() {
       int x, y;
       cmd >> x >> y;
 
-      float radius = std::max(1.0f, strokeThickness) * 0.5f;
+      float radius = std::max(1.0f, sketchState.strokeThickness) * 0.5f;
       sf::CircleShape point { radius };
-      point.setFillColor(strokeColor);
+      point.setFillColor(sketchState.strokeColor);
       point.setOrigin(radius, radius);
       point.setPosition(x, y);
 
@@ -176,24 +184,24 @@ inline void sketchReceiveData() {
 
       float angle = std::atan2(y1-y0, x1-x0) * 180.0f / M_PI;
       float w = std::sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
-      float h = std::max(1.0f, strokeThickness);
+      float h = std::max(1.0f, sketchState.strokeThickness);
       float radius = h * 0.5f;
 
       // Line
       sf::RectangleShape line { { w, h } };
-      line.setFillColor(strokeColor);
+      line.setFillColor(sketchState.strokeColor);
       line.setOrigin(0.0f, h / 2.0f);
       line.setPosition(x0, y0);
       line.rotate(angle);
 
       // Round ends
       sf::CircleShape end0 { radius };
-      end0.setFillColor(strokeColor);
+      end0.setFillColor(sketchState.strokeColor);
       end0.setOrigin(radius, radius);
       end0.setPosition(x0, y0);
 
       sf::CircleShape end1 { radius };
-      end1.setFillColor(strokeColor);
+      end1.setFillColor(sketchState.strokeColor);
       end1.setOrigin(radius, radius);
       end1.setPosition(x1, y1);
 
@@ -211,36 +219,36 @@ inline void sketchReceiveData() {
 
       // Stroke
       for (int i = 0; i < 4; ++i)
-        strokes[i].setFillColor(strokeColor);
+        strokes[i].setFillColor(sketchState.strokeColor);
 
       // Top
-      strokes[0].setSize({ (float)w, strokeThickness });
-      strokes[0].setPosition(x, y - strokeThickness);
+      strokes[0].setSize({ (float)w, sketchState.strokeThickness });
+      strokes[0].setPosition(x, y - sketchState.strokeThickness);
 
       // Bottom
-      strokes[1].setSize({ (float)w, strokeThickness });
+      strokes[1].setSize({ (float)w, sketchState.strokeThickness });
       strokes[1].setPosition(x, y + h);
 
       // Left
-      strokes[2].setSize({ strokeThickness, (float)h });
-      strokes[2].setPosition(x - strokeThickness, y);
+      strokes[2].setSize({ sketchState.strokeThickness, (float)h });
+      strokes[2].setPosition(x - sketchState.strokeThickness, y);
 
       // Right
-      strokes[3].setSize({ strokeThickness, (float)h });
+      strokes[3].setSize({ sketchState.strokeThickness, (float)h });
       strokes[3].setPosition(x + w, y);
 
       // Round corners
-      float radius = strokeThickness;
+      float radius = sketchState.strokeThickness;
       for (int i = 0; i < 4; ++i) {
         corners[i].setRadius(radius);
-        corners[i].setFillColor(strokeColor);
+        corners[i].setFillColor(sketchState.strokeColor);
         corners[i].setOrigin(radius, radius);
         corners[i].setPosition(x + (i % 2) * w, y + (i / 2) * h);
       }
 
       // Fill
       rect.setSize({ (float)w, (float)h });
-      rect.setFillColor(fillColor);
+      rect.setFillColor(sketchState.fillColor);
       rect.setPosition(x, y);
 
       for (int i = 0; i < 4; ++i) {
@@ -256,12 +264,12 @@ inline void sketchReceiveData() {
 
       float radius = r;
       sf::CircleShape circle { radius };
-      circle.setFillColor(fillColor);
+      circle.setFillColor(sketchState.fillColor);
       circle.setOrigin(radius, radius);
       circle.setPosition(x, y);
 
-      circle.setOutlineThickness(strokeThickness);
-      circle.setOutlineColor(strokeColor);
+      circle.setOutlineThickness(sketchState.strokeThickness);
+      circle.setOutlineColor(sketchState.strokeColor);
 
       window.draw(circle);
     }
@@ -270,21 +278,21 @@ inline void sketchReceiveData() {
       int r, g, b;
       cmd >> r >> g >> b;
 
-      fillColor = { (u8)r, (u8)g, (u8)b };
+      sketchState.fillColor = { (u8)r, (u8)g, (u8)b };
     }
 
     if (type == COMMAND_STROKECOLOR) {
       int r, g, b, a;
       cmd >> r >> g >> b >> a;
 
-      strokeColor = { (u8)r, (u8)g, (u8)b, (u8)a };
+      sketchState.strokeColor = { (u8)r, (u8)g, (u8)b, (u8)a };
     }
 
     if (type == COMMAND_STROKETHICKNESS) {
       int t;
       cmd >> t;
 
-      strokeThickness = t;
+      sketchState.strokeThickness = t;
     }
 
 
@@ -311,6 +319,19 @@ inline void sketchReceiveData() {
       auto view = window.getView();
       view.setCenter(x + windowWidth / 2.0f, y + windowHeight / 2.0f);
       window.setView(view);
+    }
+
+    if (type == COMMAND_PUSH) {
+      sketchStateStash.push_back(sketchState);
+    }
+
+    if (type == COMMAND_POP) {
+      if (sketchStateStash.size() > 0) {
+        sketchState = sketchStateStash.back();
+        sketchStateStash.pop_back();
+      } else {
+        printf("[sketch warning] Trying to pop empty stash!\n");
+      }
     }
   }
 }

@@ -45,7 +45,12 @@ extern fs::path shellRoot;
 extern std::string shellInput;
 
 // Sketch
-extern sf::Color fillColor;
+struct SketchState {
+  sf::Color fillColor, strokeColor;
+  float strokeThickness;
+};
+
+extern SketchState sketchState;
 extern fs::path sketchPath;
 
 }
