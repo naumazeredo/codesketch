@@ -112,7 +112,8 @@ void shellClearOutput() {
 }
 
 void shellParseInput() {
-  shellHistory.push_back(shellInput);
+  if (shellHistory.size() == 0 or shellInput != shellHistory.back())
+    shellHistory.push_back(shellInput);
   shellHistoryCursor = shellHistory.size();
   shellInputIncomplete.clear();
 

@@ -23,9 +23,13 @@ namespace codesketch {
 
 // Main
 extern sf::RenderWindow window;
+extern sf::ContextSettings windowSettings;
 
-extern int windowWidth;
-extern int windowHeight;
+extern const std::string windowTitle;
+extern const u32 windowStyle;
+
+extern const int defaultWindowWidth, defaultWindowHeight, defaultWindowFramerate;
+extern int windowWidth, windowHeight, windowFramerate;
 extern bool isRunning;
 
 extern int mouseX;
@@ -45,7 +49,12 @@ extern fs::path shellRoot;
 extern std::string shellInput;
 
 // Sketch
-extern sf::Color fillColor;
+struct SketchState {
+  sf::Color fillColor, strokeColor;
+  float strokeThickness;
+};
+
+extern SketchState sketchState;
 extern fs::path sketchPath;
 
 }
