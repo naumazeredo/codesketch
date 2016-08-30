@@ -32,7 +32,7 @@ const int colors[][3] = {
   {0xff, 0x00, 0x00}
 };
 
-const int BOARD_W = 10, BOARD_H = 20, PIECE_SIZE = 20;
+const int BOARD_W = 10, BOARD_H = 23, BOARD_TOP_H = 3, PIECE_SIZE = 20;
 
 int boardX, boardY;
 int board[BOARD_H][BOARD_W];
@@ -50,7 +50,7 @@ void drawSquare(int x, int y, int p) {
 void createPiece() {
   piece = rand()%(PIECE_NUM-1)+1;
   pieceX = 3;
-  pieceY = -3;
+  pieceY = 0;
   pieceR = rand()%4;
 }
 
@@ -68,8 +68,6 @@ int canMovePiece(int dir) {
   if (dir == DIR_L) nX--;
 
   for (int i = 0; i < 4; ++i) {
-    if (i + nY < 0) continue;
-
     for (int j = 0; j < 4; ++j) {
       char c;
       if (pieceR == 0) c = pieces[piece][i][j];
@@ -78,7 +76,7 @@ int canMovePiece(int dir) {
       if (pieceR == 3) c = pieces[piece][j][3-i];
       if (c != ' ') {
         int x = nX + j, y = nY + i;
-        if (x < 0 or x >= BOARD_W or y >= BOARD_H or board[y][x])
+        if (x < 0 or x >= BOARD_W or y >= BOARD_H or y < 0 or board[y][x])
           return 0;
       }
     }
@@ -87,9 +85,14 @@ int canMovePiece(int dir) {
   return 1;
 }
 
+void dunkPiece() {
+  while (canMovePiece(DIR_D)) movePiece(DIR_D);
+  timer = 0;
+}
+
 void drawPiece(int x, int y) {
   for (int i = 0; i < 4; ++i) {
-    if (i + pieceY < 0) continue;
+    if (i + pieceY < BOARD_TOP_H) continue;
 
     for (int j = 0; j < 4; ++j) {
       char c;
@@ -98,7 +101,7 @@ void drawPiece(int x, int y) {
       if (pieceR == 2) c = pieces[piece][3-i][3-j];
       if (pieceR == 3) c = pieces[piece][j][3-i];
       if (c != ' ')
-        drawSquare(x + (pieceX + j) * PIECE_SIZE, y + (pieceY + i) * PIECE_SIZE, piece);
+        drawSquare(x + (pieceX + j) * PIECE_SIZE, y + (pieceY + i - BOARD_TOP_H) * PIECE_SIZE, piece);
     }
   }
 }
@@ -123,18 +126,30 @@ void addPieceToBoard() {
 }
 
 void drawBoard() {
-  for (int i = 0; i < BOARD_H; ++i)
+  for (int i = 0; i < BOARD_H - BOARD_TOP_H; ++i)
     for (int j = 0; j < BOARD_W; ++j)
-      drawSquare(boardX + j * PIECE_SIZE, boardY + i * PIECE_SIZE, board[i][j]);
+      drawSquare(boardX + j * PIECE_SIZE, boardY + i * PIECE_SIZE, board[i+BOARD_TOP_H][j]);
   drawPiece(boardX, boardY);
 }
 
+int keyPressed(int key) {
+  return keyDown(key) and !keys[key];
+}
+
+void updateKeys() {
+  static int keylist[] = { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP, KEY_SPACE };
+  for (int i = 0; i < sizeof(keylist)/sizeof(keylist[0]); ++i)
+    keys[keylist[i]] = keyDown(keylist[i]);
+}
+
 void setup() {
+  framerate(20);
+
   // Random seed
   srand(time(0));
 
   // Timer
-  difficulty = 60; // number of draws until move
+  difficulty = 20; // number of draws until move
   timer = difficulty;
 
   // Board
@@ -147,16 +162,6 @@ void setup() {
 
   // Piece
   createPiece();
-}
-
-int keyPressed(int key) {
-  return keyDown(key) and !keys[key];
-}
-
-void updateKeys() {
-  static int keylist[] = { KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP };
-  for (int i = 0; i < sizeof(keylist)/sizeof(keylist[0]); ++i)
-    keys[keylist[i]] = keyDown(keylist[i]);
 }
 
 void draw() {
@@ -174,9 +179,10 @@ void draw() {
 
   background(127, 127, 127);
 
-  if (keyPressed(KEY_LEFT)  and canMovePiece(DIR_L)) movePiece(DIR_L);
-  if (keyPressed(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
-  if (keyPressed(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D);
+  if (keyDown(KEY_LEFT)  and canMovePiece(DIR_L)) movePiece(DIR_L);
+  if (keyDown(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
+  if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D);
+  if (keyPressed(KEY_SPACE)) dunkPiece();
 
   updateKeys();
 
