@@ -177,6 +177,9 @@ void holdPiece() {
       hold.type  = tmp.type;
       hold.rot   = tmp.rot;
       holdCnt--;
+
+      piece.x = 3;
+      piece.y = 0;
       return;
     }
 
