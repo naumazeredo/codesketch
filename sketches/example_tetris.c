@@ -40,6 +40,7 @@ int boardX, boardY;
 int board[BOARD_H][BOARD_W];
 
 int piece, pieceX, pieceY, pieceR;
+int next, nextR, nextX, nextY;
 
 int timer, difficulty;
 int keys[KEY_NUM];
@@ -49,12 +50,20 @@ void drawSquare(int x, int y, int p) {
   rect(x, y, PIECE_SIZE, PIECE_SIZE);
 }
 
+void createNext() {
+  next = rand()%(PIECE_NUM-1)+1;
+  nextR = rand()%pieceTotalRot[piece];
+}
+
 void createPiece() {
-  piece = rand()%(PIECE_NUM-1)+1;
+  if (!next)
+    createNext();
+
+  piece = next;
   pieceX = 3;
   pieceY = 0;
 
-  pieceR = rand()%pieceTotalRot[piece];
+  createNext();
 }
 
 void movePiece(int dir) {
@@ -178,6 +187,23 @@ void addPieceToBoard() {
   }
 }
 
+void drawNext() {
+  fill(0, 0, 0);
+  rect(nextX, nextY, 6 * PIECE_SIZE, 6 * PIECE_SIZE);
+
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      char c;
+      if (nextR == 0) c = pieces[next][i][j];
+      if (nextR == 1) c = pieces[next][3-j][i];
+      if (nextR == 2) c = pieces[next][3-i][3-j];
+      if (nextR == 3) c = pieces[next][j][3-i];
+      if (c != ' ')
+        drawSquare(nextX + (j+1) * PIECE_SIZE, nextY + (i+1) * PIECE_SIZE, next);
+    }
+  }
+}
+
 void drawBoard() {
   for (int i = 0; i < BOARD_H - BOARD_TOP_H; ++i)
     for (int j = 0; j < BOARD_W; ++j)
@@ -198,7 +224,12 @@ void startGame() {
     for (int j = 0; j < BOARD_W; ++j)
       board[i][j] = PIECE_NONE;
 
+  // Piece
   piece = 0;
+
+  // Next
+  nextX = boardX + (BOARD_W + 1) * PIECE_SIZE;
+  nextY = boardY + 5 * PIECE_SIZE;
 }
 
 void resetTimer() {
@@ -258,5 +289,6 @@ void draw() {
   updateKeys();
 
   drawBoard();
+  drawNext();
 }
 
