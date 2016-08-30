@@ -36,6 +36,8 @@ shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/co
 
 ![Example](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/example_logo.png)
 
+![Tetris](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/example_tetris.png)
+
 ## TODO
 
 - [x] Simple code sketch and sketchbook sources
