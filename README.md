@@ -194,6 +194,18 @@ void debug(const char* format, ...);
 
 // Terminate sketch execution
 void exit();
+
+// Setup exclusive commands
+
+// Enables window antialiasing (to avoid pixelated graphics)
+void smooth();
+
+// Changes window framerate to r
+void framerate(int r);
+
+// Changes window size to (w, h)
+void window(int w, int h);
+
 ```
 
 See examples in *sketches* folder if you have any doubts on how to use the API.
