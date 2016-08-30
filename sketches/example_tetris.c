@@ -71,6 +71,8 @@ int lines;
 int timer, difficulty;
 int keys[KEY_NUM];
 
+int playing, playingTimer;
+
 void createNext();
 void createPiece();
 
@@ -334,7 +336,17 @@ void drawScore() {
   text(x, y, "SCORE: %8d", score);
 }
 
-void startGame() {
+void drawControls() {
+  fill(255, 255, 255);
+  int x = boardX - 7 * PIECE_SIZE, y = boardY + 8 * PIECE_SIZE;
+  text(x, y   , "CONTROLS");
+  text(x, y+ 40, "MOVE:ARR");
+  text(x, y+ 60, "HOLD:  C");
+  text(x, y+ 80, "DROP:SPC");
+  text(x, y+100, "QUIT:ESC");
+}
+
+void resetGame() {
   // Level and score
   level = 0;
   score = 0;
@@ -367,6 +379,16 @@ void startGame() {
   hold.y = boardY + PIECE_SIZE;
 }
 
+void endGame() {
+  playing = 0;
+  playingTimer = 30;
+}
+
+void startGame() {
+  playing = 1;
+  resetGame();
+}
+
 int checkGameOver() {
   return !canMovePiece(DIR_X);
 }
@@ -385,9 +407,8 @@ void triggerTimer() {
 
     createPiece();
 
-    if (checkGameOver()) {
-      startGame();
-    }
+    if (checkGameOver())
+      endGame();
   }
 
   resetTimer();
@@ -409,27 +430,35 @@ void setup() {
   // Random seed
   srand(time(0));
 
-  startGame();
+  resetGame();
+  endGame();
 }
 
 void draw() {
-  if (frameCount%3 == 0) {
-    if (keyDown(KEY_LEFT)  and canMovePiece(DIR_L)) movePiece(DIR_L);
-    if (keyDown(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
-    if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D), resetTimer();
+  if (playing) {
+    if (frameCount%3 == 0) {
+      if (keyDown(KEY_LEFT)  and canMovePiece(DIR_L)) movePiece(DIR_L);
+      if (keyDown(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
+      if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D), resetTimer();
+    }
+
+    if (keyPressed(KEY_SPACE)) dunkPiece(), triggerTimer();
+    if (keyPressed(KEY_UP))    rotatePiece();
+    if (keyPressed(KEY_C))     holdPiece();
+
+    timer--;
+    if (timer < 0)
+      triggerTimer();
+  } else {
+    playingTimer--;
+    if (playingTimer <= 0) {
+      if (keyDown(KEY_SPACE))
+        startGame();
+    }
   }
 
-  if (keyPressed(KEY_SPACE)) dunkPiece(), triggerTimer();
-  if (keyPressed(KEY_UP))    rotatePiece();
-  if (keyPressed(KEY_C))     holdPiece();
-
-  timer--;
-  if (timer < 0)
-    triggerTimer();
-
-  background(127, 127, 127);
-
   updateKeys();
+  background(127, 127, 127);
 
   drawBoard();
   drawNext();
@@ -437,5 +466,17 @@ void draw() {
   drawScore();
   drawLevel();
   drawLines();
+  drawControls();
+
+  if (!playing) {
+    fill(0, 0, 0);
+    int y = windowHeight / 2 - 20;
+    rect(windowWidth / 2 - 120, y, 250, 60);
+
+    fill(255, 255, 255);
+    text(windowWidth / 2 - 40, y, "TETRIS");
+    if (playingTimer <= 0)
+      text(windowWidth / 2 - 120, y + 20, "Press SPACE to start!");
+  }
 }
 
