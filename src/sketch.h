@@ -103,13 +103,14 @@ enum {
   COMMAND_PUSH,
   COMMAND_POP,
 
+  /* Setup exclusive */
   COMMAND_FRAMERATE,
   COMMAND_SMOOTH,
+  COMMAND_WINDOW,
+  /* --------------- */
 
   // XXX(naum): Not implemented
   COMMAND_ELLIPSE,
-
-  COMMAND_WINDOW,
 
   COMMAND_NUM
 };

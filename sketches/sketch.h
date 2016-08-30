@@ -28,11 +28,11 @@ enum {
   /* Setup exclusive */
   _COMMAND_FRAMERATE,
   _COMMAND_SMOOTH,
+  _COMMAND_WINDOW,
   /* --------------- */
 
   // XXX(naum): Not implemented
   _COMMAND_ELLIPSE,
-  _COMMAND_WINDOW,
   //
 
   _COMMAND_NUM
@@ -250,11 +250,17 @@ void exit() {
 
 /* Setup exclusive */
 void framerate(int r) {
-  if (r <= 0) r = 1;
+  if (r <= 1) r = 1;
   printf("%d %d\n", _COMMAND_FRAMERATE, r);
 }
 
 void smooth() {
   printf("%d\n", _COMMAND_SMOOTH);
+}
+
+void window(int w, int h) {
+  if (w <= 1) w = 1;
+  if (h <= 1) h = 1;
+  printf("%d %d %d\n", _COMMAND_WINDOW, w, h);
 }
 

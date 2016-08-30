@@ -195,6 +195,20 @@ inline void sketchReceiveData() {
       windowSettings.antialiasingLevel = 8;
       recreateWindow();
     }
+
+    if (type == COMMAND_WINDOW) {
+      if (!sketchSetup) {
+        printf("[sketch warning] Calling window from outside setup!\n");
+        continue;
+      }
+
+      int w, h;
+      cmd >> w >> h;
+
+      windowWidth  = w;
+      windowHeight = h;
+      recreateWindow();
+    }
     /* -------------- */
 
     if (type == COMMAND_FRAMEEND) {
