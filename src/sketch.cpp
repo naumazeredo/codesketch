@@ -32,9 +32,16 @@ fs::path sketchPath;
 pid_t sketchpid = 0;
 int sketchin[2], sketchout[2], sketcherr[2];
 
+// Window recreate
+inline void recreateWindow() {
+  auto winpos = window.getPosition();
+  window.create(sf::VideoMode(windowWidth, windowHeight),
+                windowTitle, windowStyle, windowSettings);
+  window.setPosition(winpos);
+}
+
 inline void sketchSendData();
 inline void sketchReceiveData();
-
 
 inline void sketchInit() {
   frameCount = 0;
@@ -114,12 +121,13 @@ bool sketchOpen(const std::string& name) {
 }
 
 inline void restoreDefaults() {
-  //if (windowWidth != defaultWindowWidth or windowHeight != defaultWindowHeight)
+  windowWidth = defaultWindowWidth;
+  windowHeight = defaultWindowHeight;
+  windowSettings.antialiasingLevel = 0;
+  windowFramerate = defaultWindowFramerate;
 
-  if (windowFramerate != defaultWindowFramerate) {
-    windowFramerate = defaultWindowFramerate;
-    window.setFramerateLimit(windowFramerate);
-  }
+  recreateWindow();
+  window.setFramerateLimit(windowFramerate);
 }
 
 void sketchClose() {
@@ -165,7 +173,7 @@ inline void sketchReceiveData() {
     int type;
     cmd >> type;
 
-    // Setup commands
+    /* Setup exclusive */
     if (type == COMMAND_FRAMERATE) {
       if (!sketchSetup) {
         printf("[sketch warning] Calling framerate from outside setup!\n");
@@ -177,6 +185,17 @@ inline void sketchReceiveData() {
       windowFramerate = r;
       window.setFramerateLimit(windowFramerate);
     }
+
+    if (type == COMMAND_SMOOTH) {
+      if (!sketchSetup) {
+        printf("[sketch warning] Calling smooth from outside setup!\n");
+        continue;
+      }
+
+      windowSettings.antialiasingLevel = 8;
+      recreateWindow();
+    }
+    /* -------------- */
 
     if (type == COMMAND_FRAMEEND) {
       // Verify incorrect frame ends

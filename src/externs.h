@@ -23,6 +23,10 @@ namespace codesketch {
 
 // Main
 extern sf::RenderWindow window;
+extern sf::ContextSettings windowSettings;
+
+extern const std::string windowTitle;
+extern const u32 windowStyle;
 
 extern const int defaultWindowWidth, defaultWindowHeight, defaultWindowFramerate;
 extern int windowWidth, windowHeight, windowFramerate;

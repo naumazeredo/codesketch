@@ -7,8 +7,11 @@
 
 namespace codesketch {
 
-sf::ContextSettings settings;
 sf::RenderWindow window;
+sf::ContextSettings windowSettings;
+
+const std::string windowTitle = "Code Sketch";
+const u32 windowStyle = sf::Style::Titlebar | sf::Style::Close;
 
 const int defaultWindowWidth     = 640,
           defaultWindowHeight    = 480,
@@ -27,16 +30,9 @@ fs::path binPath;
 void init(int argc, char** argv) {
   binPath = fs::canonical((fs::current_path() / argv[0])).remove_filename();
 
-  // Initialize settings
-  //settings.antialiasingLevel = 8;
-
   // Initialize Window
-  window.create(
-    sf::VideoMode(windowWidth, windowHeight),
-    "CodeSketch",
-    sf::Style::Titlebar | sf::Style::Close,
-    settings
-  );
+  window.create(sf::VideoMode(windowWidth, windowHeight),
+                windowTitle, windowStyle, windowSettings);
 
   window.setFramerateLimit(defaultWindowFramerate);
 

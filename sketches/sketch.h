@@ -25,7 +25,10 @@ enum {
   _COMMAND_PUSH,
   _COMMAND_POP,
 
+  /* Setup exclusive */
   _COMMAND_FRAMERATE,
+  _COMMAND_SMOOTH,
+  /* --------------- */
 
   // XXX(naum): Not implemented
   _COMMAND_ELLIPSE,
@@ -239,14 +242,19 @@ void pop() {
   printf("%d\n", _COMMAND_POP);
 }
 
-void framerate(int r) {
-  if (r <= 0) r = 1;
-  printf("%d %d\n", _COMMAND_FRAMERATE, r);
-}
-
 void exit() {
   _running_ = 0;
 }
 
 #define debug(format, ...) printf("%d " format "\n", _COMMAND_DEBUG, ##__VA_ARGS__)
+
+/* Setup exclusive */
+void framerate(int r) {
+  if (r <= 0) r = 1;
+  printf("%d %d\n", _COMMAND_FRAMERATE, r);
+}
+
+void smooth() {
+  printf("%d\n", _COMMAND_SMOOTH);
+}
 
