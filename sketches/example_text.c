@@ -17,5 +17,5 @@ void draw() {
 
   fill(r, g, b);
 
-  text("Code Sketch with text!", 20, frameCount % (windowHeight+20) - 20);
+  text(20, frameCount % (windowHeight+20) - 20, "Code Sketch with text!");
 }

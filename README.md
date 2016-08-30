@@ -27,6 +27,15 @@ but why not the majority of them?
 Using the [Processing](https://processing.org) idea, as a flexible software
 sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 
+## Screenshots
+
+![Code Sketch
+shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/codesketch.png)
+
+![Shell help]( https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/help.png)
+
+![Example](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/example_logo.png)
+
 ## TODO
 
 - [x] Simple code sketch and sketchbook sources
@@ -47,23 +56,23 @@ sketchbook, I'm developing a C/C++ sketchbook, named **Code Sketch**.
 - [ ] Shell
   - [x] Basic commands
   - [ ] Text wrapping
-  - [ ] Cursor
+  - [ ] Blinking cursor
+  - [ ] Caret (?)
   - [ ] Colors (?)
-  - [ ] Better font (?)
 - [ ] Window resizing (?)
 - [ ] Port to Windows
 - [ ] Add version and setup process (instead of sending same data to setup)
 - [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
   with large input)
-- [ ] Release binaries with exclusive README
+- [ ] Release binaries (with exclusive README)
 
 ## Learning with Code Sketch
 
 ### Install dependencies
 
-SFML: `$ sudo apt-get install libsfml-system2.3v5 libsfml-graphics2.3v5 libsfml-window2.3v5`
+SFML: `$ sudo apt-get install libsfml-dev`
 
-Boost Filesystem: `$ sudo apt-get install libboost-filesystem1.58`
+Boost Filesystem (should already be installed on Ubuntu 14.04 or later): `$ sudo apt-get install libboost-dev`
 
 ### Begin to code
 
@@ -162,9 +171,9 @@ void strokeThickness(int t);
 
 // Text
 
-// Render text t with upper-left corner at (x, y)
+// Render text format (using extra variables, like printf) with upper-left corner at (x, y)
 // The text will have the fill color as it's color
-void text(const char* t, int x, int y);
+void text(int x, int y, const char* format, ...);
 
 // Change text size (s must be positive)
 void textSize(int s);
@@ -172,14 +181,31 @@ void textSize(int s);
 // Camera
 
 // Move top-left camera corner to (x, y). Starts at (0, 0)
-// (note: moving camera without sending drawing don't work as you would expect.
+// (note: moving camera without resending drawing doesn't work as you would expect.
 // This will probably be modified in the future.)
 void camera(int x, int y);
+
+// Debug
+
+// Print debug format (using extra variables, like printf)
+void debug(const char* format, ...);
 
 // Exit
 
 // Terminate sketch execution
 void exit();
+
+// Setup exclusive commands
+
+// Enables window antialiasing (to avoid pixelated graphics)
+void smooth();
+
+// Changes window framerate to r
+void framerate(int r);
+
+// Changes window size to (w, h)
+void window(int w, int h);
+
 ```
 
 See examples in *sketches* folder if you have any doubts on how to use the API.
@@ -188,6 +214,9 @@ Compile your code: `g++ mysketch.c -o mysketch.out` (on Linux)
 
 Run Code Sketch binary and type: `> run sketches/mysketch.out` (you can find
 your binary using `ls` and `cd` commands).
+
+(You can take screenshots by pressing F12. If you can't show your sketch
+running, at least take a picture :wink:)
 
 ### Be creative!
 
@@ -202,10 +231,18 @@ Happy coding!
 
 ### Dependencies
 
-SFML: `sudo apt install libsfml-dev`
+#### Ubuntu 14.04 or later
 
-Boost Filesystem: `sudo apt install libboost-filesystem-dev`
+Be sure your system is up-to-date: `sudo apt-get dist-upgrade`
 
-## Known bugs
+G++: `sudo apt-get install g++ binutils`
+
+SFML: `sudo apt-get install libsfml-dev`
+
+Boost Filesystem: `sudo apt-get install libboost-filesystem-dev`
+
+## Known bugs/problems
 
 - May run suboptimally in case of large inputs.
+- Defines on _text_ and _debug_ may not be the best option.
+- Inserting ```\n``` on text and debug can cause issues. (!)

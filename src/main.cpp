@@ -7,10 +7,18 @@
 
 namespace codesketch {
 
-sf::ContextSettings settings;
 sf::RenderWindow window;
+sf::ContextSettings windowSettings;
 
-int windowWidth = 640, windowHeight = 480;
+const std::string windowTitle = "Code Sketch";
+const u32 windowStyle = sf::Style::Titlebar | sf::Style::Close;
+
+const int defaultWindowWidth     = 640,
+          defaultWindowHeight    = 480,
+          defaultWindowFramerate = 60;
+int windowWidth     = defaultWindowWidth,
+    windowHeight    = defaultWindowHeight,
+    windowFramerate = defaultWindowFramerate;
 
 int mouseX, mouseY;
 u8 mouseState;
@@ -22,18 +30,11 @@ fs::path binPath;
 void init(int argc, char** argv) {
   binPath = fs::canonical((fs::current_path() / argv[0])).remove_filename();
 
-  // Initialize settings
-  //settings.antialiasingLevel = 8;
-
   // Initialize Window
-  window.create(
-    sf::VideoMode(windowWidth, windowHeight),
-    "CodeSketch",
-    sf::Style::Titlebar | sf::Style::Close,
-    settings
-  );
+  window.create(sf::VideoMode(windowWidth, windowHeight),
+                windowTitle, windowStyle, windowSettings);
 
-  window.setFramerateLimit(60);
+  window.setFramerateLimit(defaultWindowFramerate);
 
   // Initialize text
   textInit();
@@ -41,7 +42,7 @@ void init(int argc, char** argv) {
 
 void run() {
   window.clear();
-  shellAddHistory("Type help for help!");
+  shellAddOutput("Type help for help!");
 
   while (window.isOpen()) {
     sf::Event event;
@@ -86,9 +87,13 @@ void run() {
           } else if (event.key.code == sf::Keyboard::Return) {
             shellParseInput();
           } else if (event.key.code == sf::Keyboard::L and event.key.control) {
-            shellClearHistory();
+            shellClearOutput();
           } else if (event.key.code == sf::Keyboard::D and event.key.control) {
             window.close();
+          } else if (event.key.code == sf::Keyboard::Up) {
+            shellMoveCursorUp();
+          } else if (event.key.code == sf::Keyboard::Down) {
+            shellMoveCursorDown();
           }
         } else if (event.type == sf::Event::TextEntered) {
           shellAddInput(event.text.unicode);

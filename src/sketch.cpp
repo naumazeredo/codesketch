@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <vector>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -22,20 +23,34 @@
 namespace codesketch {
 
 // Sketch variables
-sf::Color fillColor = sf::Color::Black;
-sf::Color strokeColor = sf::Color::Black;
-float strokeThickness = 0.0f;
+SketchState sketchState;
+std::vector<SketchState> sketchStateStash;
+int sketchSetup;
 
 // Subprocess
 fs::path sketchPath;
 pid_t sketchpid = 0;
 int sketchin[2], sketchout[2], sketcherr[2];
 
+// Window recreate
+inline void recreateWindow() {
+  auto winpos = window.getPosition();
+  window.create(sf::VideoMode(windowWidth, windowHeight),
+                windowTitle, windowStyle, windowSettings);
+  window.setPosition(winpos);
+}
+
+inline void sketchSendData();
+inline void sketchReceiveData();
+
 inline void sketchInit() {
   frameCount = 0;
-  fillColor = sf::Color::Black;
-  strokeColor = sf::Color::Black;
-  strokeThickness = 0.0f;
+
+  sketchState.fillColor = sf::Color::Black;
+  sketchState.strokeColor = sf::Color::Black;
+  sketchState.strokeThickness = 0.0f;
+
+  sketchStateStash.clear();
 
   window.clear();
 }
@@ -50,7 +65,7 @@ bool sketchOpen(const std::string& name) {
   // TODO(naum): treat errors
   if (pipe(sketchin) == -1) return false;
   if (pipe(sketchout) == -1) return false;
-  if (pipe(sketcherr) == -1) return false;
+  /*if (pipe(sketcherr) == -1) return false;*/
 
   sketchpid = fork();
 
@@ -59,14 +74,16 @@ bool sketchOpen(const std::string& name) {
 
     if (dup2(sketchin[READ],   STDIN_FILENO)  == -1) return false;
     if (dup2(sketchout[WRITE], STDOUT_FILENO) == -1) return false;
-    if (dup2(sketcherr[WRITE], STDERR_FILENO) == -1) return false;
+    /*if (dup2(sketcherr[WRITE], STDERR_FILENO) == -1) return false;*/
 
     close(sketchin[READ]);
     close(sketchin[WRITE]);
     close(sketchout[READ]);
     close(sketchout[WRITE]);
+    /*
     close(sketcherr[READ]);
     close(sketcherr[WRITE]);
+    */
 
     if (execl(name.c_str(), name.c_str(), nullptr) == -1) {
       // Exec fail: kill child!
@@ -77,7 +94,7 @@ bool sketchOpen(const std::string& name) {
 
     close(sketchin[READ]);
     close(sketchout[WRITE]);
-    close(sketcherr[WRITE]);
+    /*close(sketcherr[WRITE]);*/
   } else {
     // Error
 
@@ -85,15 +102,32 @@ bool sketchOpen(const std::string& name) {
     close(sketchin[WRITE]);
     close(sketchout[READ]);
     close(sketchout[WRITE]);
+    /*
     close(sketcherr[READ]);
     close(sketcherr[WRITE]);
+    */
 
     return false;
   }
 
   sketchInit();
 
+  sketchSetup = 1;
+  sketchSendData();
+  sketchReceiveData();
+  sketchSetup = 0;
+
   return sketchIsRunning();
+}
+
+inline void restoreDefaults() {
+  windowWidth = defaultWindowWidth;
+  windowHeight = defaultWindowHeight;
+  windowSettings.antialiasingLevel = 0;
+  windowFramerate = defaultWindowFramerate;
+
+  recreateWindow();
+  window.setFramerateLimit(windowFramerate);
 }
 
 void sketchClose() {
@@ -102,10 +136,12 @@ void sketchClose() {
   kill(sketchpid, SIGKILL);
   close(sketchin[WRITE]);
   close(sketchout[READ]);
-  close(sketcherr[READ]);
+  /*close(sketcherr[READ]);*/
   sketchpid = 0;
 
   sketchPath.clear();
+
+  restoreDefaults();
 }
 
 bool sketchIsRunning() {
@@ -137,8 +173,57 @@ inline void sketchReceiveData() {
     int type;
     cmd >> type;
 
-    if (type == COMMAND_FRAMEEND)
+    /* Setup exclusive */
+    if (type == COMMAND_FRAMERATE) {
+      if (!sketchSetup) {
+        printf("[sketch warning] Calling framerate from outside setup!\n");
+        continue;
+      }
+
+      int r;
+      cmd >> r;
+      windowFramerate = r;
+      window.setFramerateLimit(windowFramerate);
+    }
+
+    if (type == COMMAND_SMOOTH) {
+      if (!sketchSetup) {
+        printf("[sketch warning] Calling smooth from outside setup!\n");
+        continue;
+      }
+
+      windowSettings.antialiasingLevel = 8;
+      recreateWindow();
+    }
+
+    if (type == COMMAND_WINDOW) {
+      if (!sketchSetup) {
+        printf("[sketch warning] Calling window from outside setup!\n");
+        continue;
+      }
+
+      int w, h;
+      cmd >> w >> h;
+
+      windowWidth  = w;
+      windowHeight = h;
+      recreateWindow();
+    }
+    /* -------------- */
+
+    if (type == COMMAND_FRAMEEND) {
+      // Verify incorrect frame ends
+      // Push and pop imbalance
+      if (sketchStateStash.size() > 0)
+        printf("[sketch warning] Push/pop imbalance. For each push must exist a pop!\n");
       break;
+    }
+
+    if (type == COMMAND_DEBUG) {
+      std::string text;
+      getline(cmd, text);
+      printf("[sketch debug]: %s\n", text.c_str());
+    }
 
     if (type == COMMAND_BACKGROUND) {
       int r, g, b;
@@ -151,9 +236,9 @@ inline void sketchReceiveData() {
       int x, y;
       cmd >> x >> y;
 
-      float radius = std::max(1.0f, strokeThickness) * 0.5f;
+      float radius = std::max(1.0f, sketchState.strokeThickness) * 0.5f;
       sf::CircleShape point { radius };
-      point.setFillColor(strokeColor);
+      point.setFillColor(sketchState.strokeColor);
       point.setOrigin(radius, radius);
       point.setPosition(x, y);
 
@@ -166,24 +251,24 @@ inline void sketchReceiveData() {
 
       float angle = std::atan2(y1-y0, x1-x0) * 180.0f / M_PI;
       float w = std::sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0));
-      float h = std::max(1.0f, strokeThickness);
+      float h = std::max(1.0f, sketchState.strokeThickness);
       float radius = h * 0.5f;
 
       // Line
       sf::RectangleShape line { { w, h } };
-      line.setFillColor(strokeColor);
+      line.setFillColor(sketchState.strokeColor);
       line.setOrigin(0.0f, h / 2.0f);
       line.setPosition(x0, y0);
       line.rotate(angle);
 
       // Round ends
       sf::CircleShape end0 { radius };
-      end0.setFillColor(strokeColor);
+      end0.setFillColor(sketchState.strokeColor);
       end0.setOrigin(radius, radius);
       end0.setPosition(x0, y0);
 
       sf::CircleShape end1 { radius };
-      end1.setFillColor(strokeColor);
+      end1.setFillColor(sketchState.strokeColor);
       end1.setOrigin(radius, radius);
       end1.setPosition(x1, y1);
 
@@ -201,36 +286,36 @@ inline void sketchReceiveData() {
 
       // Stroke
       for (int i = 0; i < 4; ++i)
-        strokes[i].setFillColor(strokeColor);
+        strokes[i].setFillColor(sketchState.strokeColor);
 
       // Top
-      strokes[0].setSize({ (float)w, strokeThickness });
-      strokes[0].setPosition(x, y - strokeThickness);
+      strokes[0].setSize({ (float)w, sketchState.strokeThickness });
+      strokes[0].setPosition(x, y - sketchState.strokeThickness);
 
       // Bottom
-      strokes[1].setSize({ (float)w, strokeThickness });
+      strokes[1].setSize({ (float)w, sketchState.strokeThickness });
       strokes[1].setPosition(x, y + h);
 
       // Left
-      strokes[2].setSize({ strokeThickness, (float)h });
-      strokes[2].setPosition(x - strokeThickness, y);
+      strokes[2].setSize({ sketchState.strokeThickness, (float)h });
+      strokes[2].setPosition(x - sketchState.strokeThickness, y);
 
       // Right
-      strokes[3].setSize({ strokeThickness, (float)h });
+      strokes[3].setSize({ sketchState.strokeThickness, (float)h });
       strokes[3].setPosition(x + w, y);
 
       // Round corners
-      float radius = strokeThickness;
+      float radius = sketchState.strokeThickness;
       for (int i = 0; i < 4; ++i) {
         corners[i].setRadius(radius);
-        corners[i].setFillColor(strokeColor);
+        corners[i].setFillColor(sketchState.strokeColor);
         corners[i].setOrigin(radius, radius);
         corners[i].setPosition(x + (i % 2) * w, y + (i / 2) * h);
       }
 
       // Fill
       rect.setSize({ (float)w, (float)h });
-      rect.setFillColor(fillColor);
+      rect.setFillColor(sketchState.fillColor);
       rect.setPosition(x, y);
 
       for (int i = 0; i < 4; ++i) {
@@ -246,12 +331,12 @@ inline void sketchReceiveData() {
 
       float radius = r;
       sf::CircleShape circle { radius };
-      circle.setFillColor(fillColor);
+      circle.setFillColor(sketchState.fillColor);
       circle.setOrigin(radius, radius);
       circle.setPosition(x, y);
 
-      circle.setOutlineThickness(strokeThickness);
-      circle.setOutlineColor(strokeColor);
+      circle.setOutlineThickness(sketchState.strokeThickness);
+      circle.setOutlineColor(sketchState.strokeColor);
 
       window.draw(circle);
     }
@@ -260,21 +345,21 @@ inline void sketchReceiveData() {
       int r, g, b;
       cmd >> r >> g >> b;
 
-      fillColor = { (u8)r, (u8)g, (u8)b };
+      sketchState.fillColor = { (u8)r, (u8)g, (u8)b };
     }
 
     if (type == COMMAND_STROKECOLOR) {
       int r, g, b, a;
       cmd >> r >> g >> b >> a;
 
-      strokeColor = { (u8)r, (u8)g, (u8)b, (u8)a };
+      sketchState.strokeColor = { (u8)r, (u8)g, (u8)b, (u8)a };
     }
 
     if (type == COMMAND_STROKETHICKNESS) {
       int t;
       cmd >> t;
 
-      strokeThickness = t;
+      sketchState.strokeThickness = t;
     }
 
 
@@ -301,6 +386,19 @@ inline void sketchReceiveData() {
       auto view = window.getView();
       view.setCenter(x + windowWidth / 2.0f, y + windowHeight / 2.0f);
       window.setView(view);
+    }
+
+    if (type == COMMAND_PUSH) {
+      sketchStateStash.push_back(sketchState);
+    }
+
+    if (type == COMMAND_POP) {
+      if (sketchStateStash.size() > 0) {
+        sketchState = sketchStateStash.back();
+        sketchStateStash.pop_back();
+      } else {
+        printf("[sketch warning] Trying to pop empty stash!\n");
+      }
     }
   }
 }

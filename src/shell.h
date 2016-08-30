@@ -39,14 +39,17 @@ const std::pair<std::string, ShellFn> shellOps[] = {
 };
 const int shellOpsSize = sizeof(shellOps)/sizeof(shellOps[0]);
 
-void shellAddHistory(const std::string&);
-void shellClearHistory();
+void shellAddOutput(const std::string&);
+void shellClearOutput();
 
 void shellParseInput();
 void shellDraw();
 
 void shellBackspace();
 void shellAddInput(u32);
+
+void shellMoveCursorUp();
+void shellMoveCursorDown();
 
 }
 

@@ -3,6 +3,7 @@
 
 enum {
   _COMMAND_FRAMEEND,
+  _COMMAND_DEBUG,
 
   _COMMAND_BACKGROUND,
 
@@ -21,9 +22,17 @@ enum {
 
   _COMMAND_CAMERA,
 
+  _COMMAND_PUSH,
+  _COMMAND_POP,
+
+  /* Setup exclusive */
+  _COMMAND_FRAMERATE,
+  _COMMAND_SMOOTH,
+  _COMMAND_WINDOW,
+  /* --------------- */
+
   // XXX(naum): Not implemented
   _COMMAND_ELLIPSE,
-  _COMMAND_WINDOW,
   //
 
   _COMMAND_NUM
@@ -214,9 +223,7 @@ void strokeThickness(int thickness) {
   printf("%d %d\n", _COMMAND_STROKETHICKNESS, thickness);
 }
 
-void text(const char* t, int x, int y) {
-  printf("%d %d %d %s\n", _COMMAND_TEXT, x, y, t);
-}
+#define text(x, y, format, ...) printf("%d %d %d " format "\n", _COMMAND_TEXT, (x), (y), ##__VA_ARGS__)
 
 void textSize(int s) {
   if (s < 0) s = 0;
@@ -227,6 +234,33 @@ void camera(int x, int y) {
   printf("%d %d %d\n", _COMMAND_CAMERA, x, y);
 }
 
+void push() {
+  printf("%d\n", _COMMAND_PUSH);
+}
+
+void pop() {
+  printf("%d\n", _COMMAND_POP);
+}
+
 void exit() {
   _running_ = 0;
 }
+
+#define debug(format, ...) printf("%d " format "\n", _COMMAND_DEBUG, ##__VA_ARGS__)
+
+/* Setup exclusive */
+void framerate(int r) {
+  if (r <= 1) r = 1;
+  printf("%d %d\n", _COMMAND_FRAMERATE, r);
+}
+
+void smooth() {
+  printf("%d\n", _COMMAND_SMOOTH);
+}
+
+void window(int w, int h) {
+  if (w <= 1) w = 1;
+  if (h <= 1) h = 1;
+  printf("%d %d %d\n", _COMMAND_WINDOW, w, h);
+}
+

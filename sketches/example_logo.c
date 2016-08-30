@@ -26,7 +26,7 @@ void draw() {
          i * windowWidth / NUM_LINES, windowHeight);
   }
 
-  text("Welcome to Code Sketch!", 20, 20);
+  text(20, 20, "Welcome to Code Sketch!");
 
   float s = (1 + sin(frameCount * k))/2;
   x = windowWidth * s;
