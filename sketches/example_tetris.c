@@ -21,12 +21,11 @@
 enum { DIR_X, DIR_U, DIR_D, DIR_L, DIR_R, DIR_NUM };
 
 enum {
-  PIECE_NONE, PIECE_I, PIECE_J, PIECE_L, PIECE_O, PIECE_S, PIECE_T, PIECE_Z,
-  PIECE_NUM
+  PIECE_I, PIECE_J, PIECE_L, PIECE_O, PIECE_S, PIECE_T, PIECE_Z,
+  PIECE_NONE, PIECE_NUM
 };
 
 const char pieces[][4][5] = {
-  { "    ", "    ", "    ", "    " },
   { "    ", "....", "    ", "    " },
   { "    ", "... ", "  . ", "    " },
   { "    ", "... ", ".   ", "    " },
@@ -36,17 +35,22 @@ const char pieces[][4][5] = {
   { "    ", "..  ", " .. ", "    " }
 };
 
-const int pieceTotalRot[] = { 1, 2, 4, 4, 1, 2, 4, 2, 1 };
+const int pieceTotalRot[] = { 2, 4, 4, 1, 2, 4, 2 };
 
 const int colors[][3] = {
-  {0x00, 0x00, 0x00},
   {0x00, 0xff, 0xff},
   {0x00, 0x00, 0xff},
   {0xff, 0xa5, 0x00},
   {0xff, 0xff, 0x00},
   {0x80, 0xff, 0x00},
   {0x80, 0x00, 0x80},
-  {0xff, 0x00, 0x00}
+  {0xff, 0x00, 0x00},
+  {0x00, 0x00, 0x00}
+};
+
+const int difftable[] = {
+  53, 49, 45, 41, 37, 33, 28, 22, 17, 11, 10,
+  9, 8, 7, 6, 6, 5, 5, 4, 4, 3
 };
 
 const int BOARD_W = 10, BOARD_H = 23, BOARD_TOP_H = 3, PIECE_SIZE = 20;
@@ -57,46 +61,61 @@ int board[BOARD_H][BOARD_W];
 struct Piece {
   int type, x, y, rot;
 } piece, next, hold;
+int previousPiece;
 
 int holdCnt;
+
+int level, levelIncrease, score;
+int lines;
 
 int timer, difficulty;
 int keys[KEY_NUM];
 
-void drawSquare(int x, int y, int p) {
-  fill(colors[p][0], colors[p][1], colors[p][2]);
-  rect(x, y, PIECE_SIZE, PIECE_SIZE);
-}
+void createNext();
+void createPiece();
 
-void holdPiece() {
-  if (holdCnt <= 0) return;
+int canMovePiece(int);
+void movePiece(int);
+void holdPiece();
+void dunkPiece();
+int rotatePiece();
 
-  if (!hold.type) {
-    hold.type  = piece.type;
-    hold.rot   = piece.rot;
-    piece.type = 0;
-  } else {
-    Piece tmp;
-    tmp.type   = hold.type;
-    tmp.rot    = hold.rot;
+void scoreLines(int);
+void removeLine(int);
+void removeCompleteLines();
+void addPieceToBoard();
 
-    hold.type  = piece.type;
-    hold.rot   = piece.rot;
+void drawSquare(int, int, int);
+void drawPiece(int, int);
+void drawNext();
+void drawHold();
+void drawBoard();
+void drawLevel();
+void drawLines();
+void drawScore();
 
-    piece.type = tmp.type;
-    piece.rot  = tmp.rot;
-  }
+void startGame();
+int checkGameOver();
 
-  holdCnt--;
-}
+void resetTimer();
+void triggerTimer();
+int keyPressed();
+void updateKeys();
 
 void createNext() {
-  next.type = rand()%(PIECE_NUM-1)+1;
-  next.rot = rand()%pieceTotalRot[piece.type];
+  next.type = rand()%7;
+  // Rerandomize in case of repeated piece
+  // to avoid equals
+  if (next.type == previousPiece)
+    next.type = rand()%7;
+
+  next.rot = rand()%pieceTotalRot[next.type];
 }
 
 void createPiece() {
-  if (!next.type)
+  previousPiece = piece.type;
+
+  if (next.type == PIECE_NONE)
     createNext();
 
   piece.type = next.type;
@@ -110,13 +129,6 @@ void createPiece() {
   holdCnt = 1;
 }
 
-void movePiece(int dir) {
-  if (dir == DIR_U) piece.y--;
-  if (dir == DIR_D) piece.y++;
-  if (dir == DIR_R) piece.x++;
-  if (dir == DIR_L) piece.x--;
-}
-
 int canMovePiece(int dir) {
   int nx = piece.x, ny = piece.y;
   if (dir == DIR_U) ny--;
@@ -126,7 +138,7 @@ int canMovePiece(int dir) {
 
   PIECE_ITER_BEGIN(piece)
     int x = nx + j, y = ny + i;
-    if (x < 0 or x >= BOARD_W or y >= BOARD_H or y < 0 or board[y][x]) {
+    if (x < 0 or x >= BOARD_W or y >= BOARD_H or y < 0 or board[y][x] != PIECE_NONE) {
       return 0;
     }
   PIECE_ITER_END()
@@ -134,8 +146,41 @@ int canMovePiece(int dir) {
   return 1;
 }
 
-int checkGameOver() {
-  return !canMovePiece(DIR_X);
+void movePiece(int dir) {
+  if (dir == DIR_U) piece.y--;
+  if (dir == DIR_D) piece.y++;
+  if (dir == DIR_R) piece.x++;
+  if (dir == DIR_L) piece.x--;
+}
+
+void holdPiece() {
+  if (holdCnt <= 0) return;
+
+  Piece tmp;
+  tmp.type   = piece.type;
+  tmp.rot    = piece.rot;
+
+  piece.type = hold.type;
+  piece.rot  = hold.rot;
+
+  if (piece.type == PIECE_NONE) {
+    hold.type  = tmp.type;
+    hold.rot   = tmp.rot;
+    holdCnt--;
+
+    triggerTimer();
+  } else {
+    for (int i = DIR_X; i < DIR_NUM; ++i) if (canMovePiece(i)) {
+      movePiece(i);
+      hold.type  = tmp.type;
+      hold.rot   = tmp.rot;
+      holdCnt--;
+      return;
+    }
+
+    piece.type = tmp.type;
+    piece.rot  = tmp.rot;
+  }
 }
 
 void dunkPiece() {
@@ -171,11 +216,20 @@ int rotatePiece() {
   return 0;
 }
 
-void drawPiece(int x, int y) {
-  PIECE_ITER_BEGIN(piece)
-    if (i + piece.y < BOARD_TOP_H) continue;
-    drawSquare(x + (piece.x + j) * PIECE_SIZE, y + (piece.y + i) * PIECE_SIZE, piece.type);
-  PIECE_ITER_END();
+void scoreLines(int n) {
+  static int scoretable[] = { 0, 40, 100, 300, 1200 };
+  score += scoretable[n] * (level + 1);
+
+  lines += n;
+
+  if (level < 20) {
+    levelIncrease -= n;
+    if (levelIncrease <= 0) {
+      level++;
+      difficulty = difftable[level];
+      levelIncrease += 10;
+    }
+  }
 }
 
 void removeLine(int x) {
@@ -184,20 +238,26 @@ void removeLine(int x) {
       board[i][j] = board[i-1][j];
 
   for (int j = 0; j < BOARD_W; ++j)
-    board[0][j] = 0;
+    board[0][j] = PIECE_NONE;
 }
 
 void removeCompleteLines() {
+  int cnt = 0;
+
   for (int i = BOARD_TOP_H; i < BOARD_H; ++i) {
     int tot = 0;
     for (int j = 0; j < BOARD_W; ++j)
-      tot += !!board[i][j];
+      tot += board[i][j]!=PIECE_NONE;
     if (tot == BOARD_W)
-      removeLine(i);
+      removeLine(i), cnt++;
   }
+
+  scoreLines(cnt);
 }
 
 void addPieceToBoard() {
+  if (piece.type == PIECE_NONE) return;
+
   PIECE_ITER_BEGIN(piece)
     int x = piece.x + j, y = piece.y + i;
     if (x >= 0 and x < BOARD_W and y >= 0 and y < BOARD_H)
@@ -218,6 +278,18 @@ void drawNext() {
   PIECE_ITER_BEGIN(next)
     drawSquare(next.x + (j+1) * PIECE_SIZE, next.y + (i+1) * PIECE_SIZE, next.type);
   PIECE_ITER_END()
+}
+
+void drawSquare(int x, int y, int p) {
+  fill(colors[p][0], colors[p][1], colors[p][2]);
+  rect(x, y, PIECE_SIZE, PIECE_SIZE);
+}
+
+void drawPiece(int x, int y) {
+  PIECE_ITER_BEGIN(piece)
+    if (i + piece.y < BOARD_TOP_H) continue;
+    drawSquare(x + (piece.x + j) * PIECE_SIZE, y + (piece.y + i) * PIECE_SIZE, piece.type);
+  PIECE_ITER_END();
 }
 
 void drawHold() {
@@ -242,9 +314,35 @@ void drawBoard() {
   drawPiece(boardX, boardY - BOARD_TOP_H * PIECE_SIZE);
 }
 
+void drawLevel() {
+  fill(255, 255, 255);
+  int x = boardX + (BOARD_W + 1) * PIECE_SIZE,
+      y = boardY + 8 * PIECE_SIZE;
+  text(x, y, "LEVEL: %2d", level);
+}
+
+void drawLines() {
+  fill(255, 255, 255);
+  int x = boardX + (BOARD_W + 1) * PIECE_SIZE,
+      y = boardY + 10 * PIECE_SIZE;
+  text(x, y, "LINES: %2d", lines);
+}
+
+void drawScore() {
+  fill(255, 255, 255);
+  int x = boardX, y = boardY + (BOARD_H - BOARD_TOP_H) * PIECE_SIZE;
+  text(x, y, "SCORE: %8d", score);
+}
+
 void startGame() {
+  // Level and score
+  level = 0;
+  score = 0;
+  levelIncrease = 10;
+  lines = 0;
+
   // Timer
-  difficulty = 20; // number of draws until move
+  difficulty = difftable[0];
   timer = 0;
 
   // Board
@@ -256,15 +354,21 @@ void startGame() {
       board[i][j] = PIECE_NONE;
 
   // Piece
-  piece.type = 0;
+  piece.type = PIECE_NONE;
 
   // Next
+  next.type = PIECE_NONE;
   next.x = boardX + (BOARD_W + 1) * PIECE_SIZE;
   next.y = boardY + PIECE_SIZE;
 
   // Hold
+  hold.type = PIECE_NONE;
   hold.x = boardX - 7 * PIECE_SIZE;
   hold.y = boardY + PIECE_SIZE;
+}
+
+int checkGameOver() {
+  return !canMovePiece(DIR_X);
 }
 
 void resetTimer() {
@@ -273,8 +377,7 @@ void resetTimer() {
 
 void triggerTimer() {
   // Try to move piece
-  debug("timer pieces: %d %d", piece.type, next.type);
-  if (piece.type and canMovePiece(DIR_D)) {
+  if (piece.type != PIECE_NONE and canMovePiece(DIR_D)) {
     movePiece(DIR_D);
   } else {
     addPieceToBoard();
@@ -301,7 +404,6 @@ void updateKeys() {
 }
 
 void setup() {
-  framerate(20);
   textSize(24);
 
   // Random seed
@@ -311,9 +413,12 @@ void setup() {
 }
 
 void draw() {
-  if (keyDown(KEY_LEFT)  and canMovePiece(DIR_L)) movePiece(DIR_L);
-  if (keyDown(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
-  if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D), resetTimer();
+  if (frameCount%3 == 0) {
+    if (keyDown(KEY_LEFT)  and canMovePiece(DIR_L)) movePiece(DIR_L);
+    if (keyDown(KEY_RIGHT) and canMovePiece(DIR_R)) movePiece(DIR_R);
+    if (keyDown(KEY_DOWN)  and canMovePiece(DIR_D)) movePiece(DIR_D), resetTimer();
+  }
+
   if (keyPressed(KEY_SPACE)) dunkPiece(), triggerTimer();
   if (keyPressed(KEY_UP))    rotatePiece();
   if (keyPressed(KEY_C))     holdPiece();
@@ -329,5 +434,8 @@ void draw() {
   drawBoard();
   drawNext();
   drawHold();
+  drawScore();
+  drawLevel();
+  drawLines();
 }
 
