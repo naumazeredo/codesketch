@@ -85,6 +85,21 @@ int canMovePiece(int dir) {
   return 1;
 }
 
+int checkGameOver() {
+  for (int i = 0; i < 4; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      char c;
+      if (pieceR == 0) c = pieces[piece][i][j];
+      if (pieceR == 1) c = pieces[piece][3-j][i];
+      if (pieceR == 2) c = pieces[piece][3-i][3-j];
+      if (pieceR == 3) c = pieces[piece][j][3-i];
+      if (c != ' ' and board[pieceY+i][pieceX+j])
+        return 1;
+    }
+  }
+  return 0;
+}
+
 void dunkPiece() {
   while (canMovePiece(DIR_D)) movePiece(DIR_D);
   timer = 0;
@@ -101,15 +116,13 @@ void drawPiece(int x, int y) {
       if (pieceR == 2) c = pieces[piece][3-i][3-j];
       if (pieceR == 3) c = pieces[piece][j][3-i];
       if (c != ' ')
-        drawSquare(x + (pieceX + j) * PIECE_SIZE, y + (pieceY + i - BOARD_TOP_H) * PIECE_SIZE, piece);
+        drawSquare(x + (pieceX + j) * PIECE_SIZE, y + (pieceY + i) * PIECE_SIZE, piece);
     }
   }
 }
 
 void addPieceToBoard() {
   for (int i = 0; i < 4; ++i) {
-    if (i + pieceY < 0) continue;
-
     for (int j = 0; j < 4; ++j) {
       char c;
       if (pieceR == 0) c = pieces[piece][i][j];
@@ -129,7 +142,24 @@ void drawBoard() {
   for (int i = 0; i < BOARD_H - BOARD_TOP_H; ++i)
     for (int j = 0; j < BOARD_W; ++j)
       drawSquare(boardX + j * PIECE_SIZE, boardY + i * PIECE_SIZE, board[i+BOARD_TOP_H][j]);
-  drawPiece(boardX, boardY);
+  drawPiece(boardX, boardY - BOARD_TOP_H * PIECE_SIZE);
+}
+
+void startGame() {
+  // Timer
+  difficulty = 20; // number of draws until move
+  timer = difficulty;
+
+  // Board
+  boardX = (windowWidth - PIECE_SIZE * BOARD_W) / 2;
+  boardY = 20;
+
+  for (int i = 0; i < BOARD_H; ++i)
+    for (int j = 0; j < BOARD_W; ++j)
+      board[i][j] = PIECE_NONE;
+
+  // Piece
+  createPiece();
 }
 
 int keyPressed(int key) {
@@ -148,20 +178,7 @@ void setup() {
   // Random seed
   srand(time(0));
 
-  // Timer
-  difficulty = 20; // number of draws until move
-  timer = difficulty;
-
-  // Board
-  boardX = (windowWidth - PIECE_SIZE * BOARD_W) / 2;
-  boardY = 20;
-
-  for (int i = 0; i < BOARD_H; ++i)
-    for (int j = 0; j < BOARD_W; ++j)
-      board[i][j] = PIECE_NONE;
-
-  // Piece
-  createPiece();
+  startGame();
 }
 
 void draw() {
@@ -173,6 +190,9 @@ void draw() {
     } else {
       addPieceToBoard();
       createPiece();
+      if (checkGameOver()) {
+        startGame();
+      }
     }
     timer = difficulty;
   }
