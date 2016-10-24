@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdint.h>
 
 enum {
   _COMMAND_FRAMEEND,
