@@ -28,10 +28,10 @@ enum {
 const char pieces[][4][5] = {
   { "    ", "....", "    ", "    " },
   { "    ", "... ", "  . ", "    " },
-  { "    ", "... ", ".   ", "    " },
+  { "    ", " ...", " .  ", "    " },
   { "    ", " .. ", " .. ", "    " },
   { "    ", " .. ", "..  ", "    " },
-  { "    ", "... ", " .  ", "    " },
+  { "    ", " .  ", "... ", "    " },
   { "    ", "..  ", " .. ", "    " }
 };
 
@@ -106,12 +106,13 @@ void updateKeys();
 
 void createNext() {
   next.type = rand()%7;
+
   // Rerandomize in case of repeated piece
   // to avoid equals
   if (next.type == previousPiece)
     next.type = rand()%7;
 
-  next.rot = rand()%pieceTotalRot[next.type];
+  next.rot = 0;
 }
 
 void createPiece() {
@@ -123,7 +124,7 @@ void createPiece() {
   piece.type = next.type;
   piece.rot = next.rot;
   piece.x = 3;
-  piece.y = 0;
+  piece.y = 1;
 
   createNext();
 
@@ -163,11 +164,10 @@ void holdPiece() {
   tmp.rot    = piece.rot;
 
   piece.type = hold.type;
-  piece.rot  = hold.rot;
+  piece.rot  = 0;
 
   if (piece.type == PIECE_NONE) {
     hold.type  = tmp.type;
-    hold.rot   = tmp.rot;
     holdCnt--;
 
     triggerTimer();
@@ -175,11 +175,10 @@ void holdPiece() {
     for (int i = DIR_X; i < DIR_NUM; ++i) if (canMovePiece(i)) {
       movePiece(i);
       hold.type  = tmp.type;
-      hold.rot   = tmp.rot;
       holdCnt--;
 
       piece.x = 3;
-      piece.y = 0;
+      piece.y = 1;
       return;
     }
 
