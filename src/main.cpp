@@ -22,7 +22,7 @@ int windowWidth     = defaultWindowWidth,
 
 fs::path binPath;
 
-void init(int argc, char** argv) {
+void init(int /*argc*/, char** argv) {
   binPath = fs::canonical((fs::current_path() / argv[0])).remove_filename();
 
   // Initialize Window
