@@ -61,7 +61,7 @@ shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/co
   - [ ] Blinking cursor
   - [ ] Caret (?)
   - [ ] Colors (?)
-- [ ] Window resizing (?)
+- [x] Window resizing
 - [ ] Port to Windows
 - [ ] Add version and setup process (instead of sending same data to setup)
 - [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
