@@ -12,16 +12,20 @@ ifeq ($(OS), Windows_NT)
 
 	PACK_CMD=zip -r
 	PACK_NAME=CodeSketch-win.zip
+
+	RUN=./$(EXE_NAME)
 else
 	LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system -lboost_filesystem
-	#LIBS_PATH=-L"/mnt/c/SFML-2.4.2/lib" -L"/mnt/c/boost_1_63_0/stage/lib"
-	#INCLUDES=-I"/mnt/c/SFML-2.4.2/include" -I"/mnt/c/boost_1_63_0"
+	LIBS_PATH=-L"/mnt/c/SFML-2.4.2/lib" -L"/mnt/c/boost_1_63_0/stage/lib"
+	INCLUDES=-I"/mnt/c/SFML-2.4.2/include" -I"/mnt/c/boost_1_63_0"
 
 	DLLS_FOLDER=libs/linux
 	EXE_NAME=codesketch.out
 
 	PACK_CMD=tar czvf
 	PACK_NAME=CodeSketch-linux.tar.gz
+
+	RUN=DISPLAY=:0 ./CodeSketch-linux.sh
 endif
 
 SRCS=src/main.cpp src/text.cpp src/shell.cpp src/sketch.cpp
@@ -49,7 +53,7 @@ deps:
 
 run: $(EXE) deps
 	@echo "Executing CodeSketch..."
-	@cd $(BIN_FOLDER) && ./$(EXE_NAME)
+	@cd $(BIN_FOLDER) && $(RUN)
 
 clean:
 	@echo "Cleaning the mess..."
