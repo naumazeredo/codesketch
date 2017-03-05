@@ -1,3 +1,6 @@
 screenshots/
 bin/
 *.out
+*.zip
+*.tar.gz
+*.tar.bz2
