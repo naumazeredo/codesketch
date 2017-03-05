@@ -64,7 +64,7 @@ bool sketchOpen(const std::string& name) {
 
   sketchPath = path;
 
-  sketchProcess.open(sketchPath.string());
+  sketchProcess.open(sketchPath.string(), subprocess::OPEN_ALL | subprocess::NONBLOCKING_STDERR);
 
   return sketchIsRunning();
 }
