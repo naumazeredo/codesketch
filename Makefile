@@ -1,10 +1,12 @@
 CC=g++
+OPTS=-Wall -std=c++11
 
 ifeq ($(OS), Windows_NT)
 	LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system.dll -lboost_filesystem.dll
 	LIBS_PATH=-L"C:/SFML-2.4.1/lib" -L"C:/boost_1_63_0/stage/lib"
 	INCLUDES=-I"C:/SFML-2.4.1/include" -I"C:/boost_1_63_0"
 	DLLS_FOLDER=libs/win
+	OPTS+=-mwindows
 	EXE_NAME=codesketch.exe
 else
 	LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system -lboost_filesystem
@@ -14,7 +16,6 @@ else
 	EXE_NAME=codesketch.out
 endif
 
-OPTS=-Wall -std=c++11
 
 SRCS=src/main.cpp src/text.cpp src/shell.cpp src/sketch.cpp
 
