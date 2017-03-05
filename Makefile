@@ -9,6 +9,7 @@ ifeq ($(OS), Windows_NT)
 	OPTS+=-mwindows
 	EXE_NAME=codesketch.exe
 	PACK_CMD=zip -r
+	PACK_NAME=CodeSketch.zip
 else
 	LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system -lboost_filesystem
 	#LIBS_PATH=-L"/mnt/c/SFML-2.4.2/lib" -L"/mnt/c/boost_1_63_0/stage/lib"
@@ -16,6 +17,7 @@ else
 	DLLS_FOLDER=libs/linux
 	EXE_NAME=codesketch.out
 	PACK_CMD=tar czvf
+	PACK_NAME=CodeSketch.tar.gz
 endif
 
 SRCS=src/main.cpp src/text.cpp src/shell.cpp src/sketch.cpp
@@ -24,7 +26,6 @@ FONTS_FOLDER=fonts
 BIN_FOLDER=bin
 EXE=$(BIN_FOLDER)/$(EXE_NAME)
 
-PACK_NAME=CodeSketch
 
 all: $(EXE)
 
@@ -46,7 +47,7 @@ run: $(EXE) dep
 clean:
 	@echo "Cleaning the mess..."
 	@rm -rf $(BIN_FOLDER)
-	@rm -f 
+	@rm -f $(PACK_NAME)
 
 pack: $(EXE) dep
 	cd bin && $(PACK_CMD) ../$(PACK_NAME) *
