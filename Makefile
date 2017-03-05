@@ -9,7 +9,7 @@ ifeq ($(OS), Windows_NT)
 	OPTS+=-mwindows
 	EXE_NAME=codesketch.exe
 	PACK_CMD=zip -r
-	PACK_NAME=CodeSketch.zip
+	PACK_NAME=CodeSketch-win.zip
 else
 	LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system -lboost_filesystem
 	#LIBS_PATH=-L"/mnt/c/SFML-2.4.2/lib" -L"/mnt/c/boost_1_63_0/stage/lib"
@@ -17,7 +17,7 @@ else
 	DLLS_FOLDER=libs/linux
 	EXE_NAME=codesketch.out
 	PACK_CMD=tar czvf
-	PACK_NAME=CodeSketch.tar.gz
+	PACK_NAME=CodeSketch-linux.tar.gz
 endif
 
 SRCS=src/main.cpp src/text.cpp src/shell.cpp src/sketch.cpp
