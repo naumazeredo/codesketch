@@ -1,12 +1,10 @@
 #include "sketch.h"
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <fcntl.h>
+#include "subprocess/subprocess.hpp"
 
 #include <cstdio>
 #include <cstring>
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <sstream>
@@ -34,8 +32,7 @@ int frameCount;
 
 // Subprocess
 fs::path sketchPath;
-pid_t sketchpid = 0;
-int sketchin[2], sketchout[2], sketcherr[2];
+subprocess::Process sketchProcess;
 
 // Window recreate
 inline void recreateWindow() {
@@ -67,59 +64,7 @@ bool sketchOpen(const std::string& name) {
 
   sketchPath = path;
 
-  // TODO(naum): treat errors
-  if (pipe(sketchin) == -1) return false;
-  if (pipe(sketchout) == -1) return false;
-  if (pipe(sketcherr) == -1) return false;
-
-  sketchpid = fork();
-
-  if (sketchpid == 0) {
-    // Child process (sketch);
-
-    if (dup2(sketchin[READ],   STDIN_FILENO)  == -1) return false;
-    if (dup2(sketchout[WRITE], STDOUT_FILENO) == -1) return false;
-    if (dup2(sketcherr[WRITE], STDERR_FILENO) == -1) return false;
-
-    close(sketchin[READ]);
-    close(sketchin[WRITE]);
-    close(sketchout[READ]);
-    close(sketchout[WRITE]);
-    close(sketcherr[READ]);
-    close(sketcherr[WRITE]);
-
-    if (execl(name.c_str(), name.c_str(), nullptr) == -1) {
-      // Exec fail: kill child!
-      kill(getpid(), SIGKILL);
-    }
-  } else if (sketchpid > 0) {
-    // Parent process
-
-    close(sketchin[READ]);
-    close(sketchout[WRITE]);
-    close(sketcherr[WRITE]);
-
-    // Non-blocking stderr
-    fcntl(sketcherr[READ], F_SETFL, fcntl(sketcherr[READ], F_GETFL, 0) | O_NONBLOCK);
-  } else {
-    // Error
-
-    close(sketchin[READ]);
-    close(sketchin[WRITE]);
-    close(sketchout[READ]);
-    close(sketchout[WRITE]);
-    close(sketcherr[READ]);
-    close(sketcherr[WRITE]);
-
-    return false;
-  }
-
-  sketchInit();
-
-  sketchSetup = 1;
-  sketchSendData();
-  sketchReceiveData();
-  sketchSetup = 0;
+  sketchProcess.open(sketchPath.string());
 
   return sketchIsRunning();
 }
@@ -127,75 +72,32 @@ bool sketchOpen(const std::string& name) {
 inline void sketchReadErrors() {
   std::string data;
 
-  while (1) {
-    data = "";
-
-    char c;
-    int bytesread;
-    while ((bytesread = read(sketcherr[READ], &c, 1)) > 0 and c != '\n')
-      data += c;
-
-    if (data.length() > 0)
-      printf("[sketch stderr] %s\n", data.c_str());
-
-    if (bytesread <= 0)
-      break;
-  }
+  while (sketchProcess.read_stderr_line(data))
+    printf("[sketch stderr] %s\n", data.c_str());
 }
 
 inline void restoreDefaults() {
-  windowWidth = defaultWindowWidth;
-  windowHeight = defaultWindowHeight;
-  windowSettings.antialiasingLevel = 0;
+  windowWidth     = defaultWindowWidth;
+  windowHeight    = defaultWindowHeight;
   windowFramerate = defaultWindowFramerate;
+  windowSettings.antialiasingLevel = 0;
 
   recreateWindow();
   window.setFramerateLimit(windowFramerate);
 }
 
 void sketchClose() {
-  if (!sketchIsRunning()) return;
-
-  // Try to read errors before closing
-  // XXX(naum): Not working...
-  /*sketchReadErrors();*/
-
-  kill(sketchpid, SIGKILL);
-  close(sketchin[WRITE]);
-  close(sketchout[READ]);
-  close(sketcherr[READ]);
-  sketchpid = 0;
+  sketchProcess.kill();
 
   sketchPath.clear();
 
   restoreDefaults();
 }
 
-bool sketchIsRunning() {
-  int sketchStatus = 0;
-  if (sketchpid == 0 or waitpid(sketchpid, &sketchStatus, WNOHANG) != 0) {
-    sketchpid = 0;
-    return false;
-  }
-
-  return true;
-}
-
 inline void sketchReceiveData() {
   std::string data;
 
-  while (sketchIsRunning()) {
-    data = "";
-
-    char c;
-    int bytesread;
-    while ((bytesread = read(sketchout[READ], &c, 1)) > 0 and c != '\n')
-      data += c;
-
-    // Error reading pipe or end of file
-    if (bytesread <= 0)
-      break;
-
+  while (sketchProcess.read_stdout_line(data)) {
     std::istringstream cmd(data);
     int type;
     cmd >> type;
@@ -458,8 +360,13 @@ inline void sketchSendData() {
   sprintf(data, "%d %d %d %d %d %d %s\n",
           frameCount, windowWidth, windowHeight, mouseX, mouseY, mouseState, keysstr);
 
-  write(sketchin[WRITE], data, strlen(data));
+  sketchProcess.write(data, strlen(data));
+
   frameCount++;
+}
+
+bool sketchIsRunning() {
+  return sketchProcess.is_active();
 }
 
 void sketchRun() {

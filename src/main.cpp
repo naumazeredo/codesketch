@@ -23,7 +23,8 @@ int windowWidth     = defaultWindowWidth,
 fs::path binPath;
 
 void init(int /*argc*/, char** argv) {
-  binPath = fs::canonical((fs::current_path() / argv[0])).remove_filename();
+  //binPath = fs::canonical((fs::current_path() / argv[0])).remove_filename();
+  binPath = fs::system_complete(fs::path{ argv[0] }).remove_filename();
 
   // Initialize Window
   window.create(sf::VideoMode(windowWidth, windowHeight),
@@ -116,6 +117,7 @@ void run() {
 }
 
 int main(int argc, char** argv) {
+  #include <cstdio>
   codesketch::init(argc, argv);
   codesketch::run();
 }
