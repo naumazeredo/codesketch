@@ -2,8 +2,7 @@
 
 Simple platform to teach C and C++ easily.
 
-*Still in development*
-*Linux-only by now*
+Runs on Windows and Linux!
 
 ## Idea
 
