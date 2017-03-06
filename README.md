@@ -38,43 +38,11 @@ shell](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/co
 
 ![Tetris](https://raw.githubusercontent.com/naumazeredo/codesketch/images/images/example_tetris.png)
 
-## TODO
-
-- [x] Simple code sketch and sketchbook sources
-- [x] Simple Makefile
-- [x] Implement text rendering
-  - [ ] Dynamic font loading (by sketches) (?)
-- [x] Create simple GUI in codesketch to list and run sketches
-- [x] Refactor code sketch for alfa version
-- [x] Implement drawing primitives
-  - [x] Points
-  - [x] Lines
-  - [x] Rectangles
-  - [x] Circles
-  - [ ] Ellipses (?)
-- [x] Camera functionality
-  - [ ] Move camera without redrawing everything to work
-- [ ] Drawing rotate/scale/zoom
-- [ ] Shell
-  - [x] Basic commands
-  - [ ] Text wrapping
-  - [ ] Blinking cursor
-  - [ ] Caret (?)
-  - [ ] Colors (?)
-- [x] Window resizing
-- [ ] Port to Windows
-- [ ] Add version and setup process (instead of sending same data to setup)
-- [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
-  with large input)
-- [ ] Release binaries (with exclusive README)
 
 ## Learning with Code Sketch
 
-### Install dependencies
-
-SFML: `$ sudo apt-get install libsfml-dev`
-
-Boost Filesystem (should already be installed on Ubuntu 14.04 or later): `$ sudo apt-get install libboost-dev`
+OBS.: On Windows, CodeSketch is _sometimes_ blocked by Smart Screen or
+anti-virus.
 
 ### Begin to code
 
@@ -212,10 +180,12 @@ void window(int w, int h);
 
 See examples in *sketches* folder if you have any doubts on how to use the API.
 
-Compile your code: `g++ mysketch.c -o mysketch.out` (on Linux)
+Compile your code. (Linux: `g++ mysketch.c -o mysketch.out`. Windows: compile on
+any IDE) (on Windows you can put a compile flag -mwindows to disable the
+console on run).
 
-Run Code Sketch binary and type: `> run sketches/mysketch.out` (you can find
-your binary using `ls` and `cd` commands).
+Run Code Sketch binary and type: `> run sketches/mysketch.out` or `> run
+sketches/mysketch.exe` (you can find your binary using `ls` and `cd` commands).
 
 (You can take screenshots by pressing F12. If you can't show your sketch
 running, at least take a picture :wink:)
@@ -233,18 +203,47 @@ Happy coding!
 
 ### Dependencies
 
-#### Ubuntu 14.04 or later
+#### Ubuntu 16.04 or later
 
-Be sure your system is up-to-date: `sudo apt-get dist-upgrade`
+GCC C++: `sudo apt install g++ binutils`
 
-G++: `sudo apt-get install g++ binutils`
+SFML: `sudo apt install libsfml-dev`
 
-SFML: `sudo apt-get install libsfml-dev`
-
-Boost Filesystem: `sudo apt-get install libboost-filesystem-dev`
+Boost Filesystem: `sudo apt install libboost-filesystem-dev`
 
 ## Known bugs/problems
 
+- SFML doesn't recognize keyboard layout from OS.
+- Windows version is blocked by SmartScreen and some anti-viruses.
 - May run suboptimally in case of large inputs.
 - Defines on _text_ and _debug_ may not be the best option.
-- Inserting ```\n``` on text and debug can cause issues. (!)
+- Inserting `\n` on text and debug can cause issues. (!)
+
+## TODO
+
+- [x] Simple code sketch and sketchbook sources
+- [x] Simple Makefile
+- [x] Implement text rendering
+  - [ ] Dynamic font loading (by sketches) (?)
+- [x] Create simple GUI in codesketch to list and run sketches
+- [x] Refactor code sketch for alfa version
+- [x] Implement drawing primitives
+  - [x] Points
+  - [x] Lines
+  - [x] Rectangles
+  - [x] Circles
+  - [ ] Ellipses (?)
+- [x] Camera functionality
+  - [ ] Move camera without redrawing everything to work
+- [ ] Drawing rotate/scale/zoom
+- [ ] Shell
+  - [x] Basic commands
+  - [ ] Text wrapping
+  - [ ] Blinking cursor
+  - [ ] Caret
+  - [ ] Colors
+- [x] Window resizing
+- [x] Port to Windows
+- [ ] Add version and setup process (instead of sending same data to setup)
+- [ ] Verify if sketch is running suboptimally (less than 60fps. May happen
+  with large input)
