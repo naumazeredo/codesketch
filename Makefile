@@ -2,7 +2,7 @@ CC=g++
 OPTS=-Wall -std=c++11
 
 ifeq ($(OS), Windows_NT)
-	LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system.dll -lboost_filesystem.dll
+	LIBS=-lsfml-graphics -lsfml-system -lsfml-window -lboost_system-mgw63-1_63 -lboost_filesystem-mgw63-1_63
 	LIBS_PATH=-L"C:/SFML-2.4.1/lib" -L"C:/boost_1_63_0/stage/lib"
 	INCLUDES=-I"C:/SFML-2.4.1/include" -I"C:/boost_1_63_0"
 
