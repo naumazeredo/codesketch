@@ -77,6 +77,7 @@ inline void sketchReadErrors() {
 }
 
 inline void restoreDefaults() {
+  sketchSetup     = 1;
   windowWidth     = defaultWindowWidth;
   windowHeight    = defaultWindowHeight;
   windowFramerate = defaultWindowFramerate;
@@ -332,6 +333,9 @@ inline void sketchReceiveData() {
   }
 
   sketchReadErrors();
+
+  if (sketchSetup)
+    sketchSetup = 0;
 }
 
 inline void sketchSendData() {
